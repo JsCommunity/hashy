@@ -3,7 +3,7 @@
 	"version": "0.1.0",
 	"description": "Create, check and update password hashes.",
 
-	"license": "GPLv3",
+	"license": "MIT",
 	"keywords": [
 		"password",
 		"hash"
@@ -26,6 +26,7 @@
 
 	"main": "index",
 	"dependencies": {
-		"bcryptjs": ">=0.7.7"
+		"bcryptjs": ">=0.7.7",
+		"q": ">=0.9.6"
 	}
 }

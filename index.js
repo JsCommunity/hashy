@@ -1,6 +1,13 @@
-// @todo Use promises instead of callbacks for lisibility?
+/**
+ * This file is part of Hashy which is released under the MIT license.
+ *
+ * @author Julien Fontanet <julien.fontanet@isonoe.net>
+ */
+
+//////////////////////////////////////////////////////////////////////
 
 var bcrypt = require('bcryptjs');
+var Q      = require('q');
 
 //////////////////////////////////////////////////////////////////////
 
@@ -26,22 +33,25 @@ exports.DEFAULT = DEFAULT;
  * @param {string} password The password to hash.
  * @param {integer} algo Identifier of the algorithm to use.
  * @param {object} options Options for the algorithm.
- * @param {function(Error, string)} callback Callback receiving the
- *     error if any and the resulting hash.
+ *
+ * @return {object} A Q promise which will receive the hashed password.
  */
-var hash = function (password, algo, options, callback) {
+var hash = function (password, algo, options) {
+	algo = algo || DEFAULT;
+
 	if (algo === BCRYPT)
 	{
-		bcrypt.hash(
+		return Q.ninvoke(
+			bcrypt,
+			'hash',
 			password,
-			options && options.cost || 10,
-			callback
+			options && options.cost || 10
 		);
 	}
-	else
-	{
-		callback(new Error('unsupported algorithm'));
-	}
+
+	return Q.fcall(function () {
+		throw new Error('unsupported algorithm');
+	});
 };
 exports.hash = hash;
 
@@ -54,9 +64,8 @@ exports.hash = hash;
  *     hash: “algo”: the algorithm used, “options” the options used.
  */
 var getInfo = function (hash) {
-
 	// What to do with “$2x$” and “$2y$”?
-	if (hash.startsWith('$2a$'))
+	if (hash.substring(0, 4) === '$2a$')
 	{
 		return {
 			'algo': BCRYPT,
@@ -88,6 +97,8 @@ exports.getInfo = getInfo;
  * @return {boolean} Whether the hash needs to be recomputed.
  */
 var needsRehash = function (hash, algo, options) {
+	algo = algo || DEFAULT;
+
 	var info = getInfo(hash);
 
 	if (info.algo !== algo)
@@ -99,7 +110,7 @@ var needsRehash = function (hash, algo, options) {
 	{
 		var cost = options && options.cost || 10;
 
-		return (info.cost !== cost);
+		return (info.options.cost !== cost);
 	}
 
 	return false;
@@ -111,16 +122,19 @@ exports.needsRehash = needsRehash;
  *
  * @param {string} password The password.
  * @param {string} hash The hash.
- * @param {function(Error, boolean)} callback Callback receiving the
- *     error if any and a boolean.
+ *
+ * @return {object} A Q promise which will receive a boolean.
  */
-var verify = function (password, hash, callback) {
-	var info = needsRehash(hash);
+var verify = function (password, hash) {
+	var info = getInfo(hash);
 
-	if (info.algo === BCRYPT) {
-		return bcrypt.compare(password, hash, callback);
+	if (info.algo === BCRYPT)
+	{
+		return Q.ninvoke(bcrypt, 'compare', password, hash);
 	}
 
-	callback(new Error('unsupported algorithm'));
+	return Q.fcall(function () {
+		throw new Error('unsupported algorithm');
+	});
 };
 exports.verify = verify;
