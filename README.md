@@ -20,9 +20,17 @@ important features.
 
 The main missing feature is the `needRehash()` function: cryptography
 is a fast-moving science and algorithms can quickly become obsolete or
-their parameters needs to be adjusted to compansate the performance
+their parameters needs to be adjusted to compensate the performance
 increase of recent computers (e.g. [bcrypt cost
 factor](http://phpmaster.com/why-you-should-use-bcrypt-to-hash-stored-passwords/)).
+
+This is exactly what this function is for: checking whether a hash
+uses the correct algorithm (and options) to see if we need to compute
+a new hash for this password.
+
+## How to use it?
+
+Just take a look at [the available example](https://github.com/julien-f/nodejs-password-hash/blob/master/examples/basic.js).
 
 ## License
 
