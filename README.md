@@ -30,7 +30,7 @@ a new hash for this password.
 
 ## How to use it?
 
-Just take a look at [the available example](https://github.com/julien-f/nodejs-password-hash/blob/master/examples/basic.js).
+Just take a look at [the available example](https://github.com/julien-f/nodejs-hashy/blob/master/examples/basic.js).
 
 ## License
 
