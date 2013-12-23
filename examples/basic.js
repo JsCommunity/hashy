@@ -15,12 +15,6 @@ var hashy = require('..');
 
 //////////////////////////////////////////////////////////////////////
 
-// As you can see we are using a promises-based interface instead of
-// callbacks.
-//
-// This helps keeping the functions interfaces as clear as possible
-// while making your code easier to read.
-
 // This value will probably be retrieved from a database.
 var hash = '$2a$08$3VbKizuJA1RdlRafd48Kfuf/eKE9kPhP8tOoyHFDmmr/rFkV.d/mO';
 
