@@ -54,7 +54,7 @@ it defaults to `{cost: 10}.`.
 hashy.verify(password, hash, function (error, success) {
   if (error)
   {
-    console.error(err);
+    return console.error(err);
   }
 
   if (success)
