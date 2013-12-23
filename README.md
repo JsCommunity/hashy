@@ -90,6 +90,15 @@ if (hashy.needsRehash(hash))
 It handles the optional `algo` and `options` parameters like
 [`hash()`](#creating-a-hash).
 
+# Changing default options.
+
+The default options for a given algorithm is available at `hashy.options[&gt;algo&lt;]`.
+
+```js
+// Sets the default cost for bcrypt to 12.
+hashy.options[hashy.BCRYPT].cost = 12.
+```
+
 ## License
 
 Hashy is released under the [MIT

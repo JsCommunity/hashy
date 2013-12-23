@@ -12,6 +12,24 @@ var bcrypt = require('bcrypt');
 
 //////////////////////////////////////////////////////////////////////
 
+var extend = function (target, source) {
+  for (var i = 1, n = arguments.length; i < n; ++i)
+  {
+    source = arguments[i];
+    for (var key in source)
+    {
+      if (source.hasOwnProperty(key))
+      {
+        target[key] = source[key];
+      }
+    }
+  }
+
+  return target;
+};
+
+//--------------------------------------------------------------------
+
 var toString = {}.toString.call.bind({}.toString);
 
 var isFunction = function (val) {
@@ -19,6 +37,11 @@ var isFunction = function (val) {
 };
 
 //////////////////////////////////////////////////////////////////////
+
+var globalOptions = {}
+exports.options = globalOptions;
+
+//--------------------------------------------------------------------
 
 /**
  * Identifier for the bcrypt algorithm.
@@ -28,6 +51,10 @@ var isFunction = function (val) {
 var BCRYPT = 1;
 exports.BCRYPT = BCRYPT;
 
+globalOptions[BCRYPT] = {
+  cost: 10,
+};
+
 /**
  * Default algorithm to use for hashing.
  *
@@ -35,6 +62,8 @@ exports.BCRYPT = BCRYPT;
  */
 var DEFAULT = BCRYPT;
 exports.DEFAULT = DEFAULT;
+
+//--------------------------------------------------------------------
 
 /**
  * Hashes a password.
@@ -65,14 +94,12 @@ var hash = function (password, algo, options, callback) {
   }
 
   algo = algo || DEFAULT;
-  options = options || {};
 
   if (algo === BCRYPT)
   {
-    // FIXME: default options should be declared somewhere else.
-    var cost = options.cost || 10;
+    options = extend({}, options, globalOptions[BCRYPT]);
 
-    return bcrypt.genSalt(cost, function (error, salt) {
+    return bcrypt.genSalt(options.cost, function (error, salt) {
       if (error)
       {
         return callback(error);
@@ -136,7 +163,6 @@ exports.getInfo = getInfo;
  */
 var needsRehash = function (hash, algo, options) {
   algo = algo || DEFAULT;
-  options = options || {};
 
   var info = getInfo(hash);
 
@@ -147,9 +173,9 @@ var needsRehash = function (hash, algo, options) {
 
   if (algo === BCRYPT)
   {
-    var cost = options.cost || 10;
+    options = extend({}, options, globalOptions[BCRYPT]);
 
-    return (info.options.cost !== cost);
+    return (info.options.cost !== options.cost);
   }
 
   return false;
