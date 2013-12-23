@@ -35,14 +35,14 @@ First, you may take a look at [the available example](https://github.com/julien-
 ### Creating a hash
 
 ```js
-hashy.hash(password)
-	.then(function (hash) {
-		console.log('generated hash: ', hash);
-	})
-	.fail(function (err) {
-		console.error(err);
-	})
-	.done();
+hashy.hash(password, null, null, function (error, hash) {
+  if (error)
+  {
+    return console.log(error);
+  }
+
+  console.log('generated hash: ', hash);
+});
 ```
 
 `hash()` handles additionaly two optional parameters:
@@ -56,21 +56,21 @@ it defaults to `{cost: 10}.`.
 ### Checking a password against a hash
 
 ```js
-hashy.verify(password, hash)
-	.then(function (success) {
-		if (success)
-		{
-			console.log('you are now authenticated!');
-		}
-		else
-		{
-			console.warn('invalid password!');
-		}
-	})
-	.fail(function (err) {
-		console.error(err);
-	})
-	.done();
+hashy.verify(password, hash, function (error, success) {
+  if (error)
+  {
+    console.error(err);
+  }
+
+  if (success)
+  {
+    console.log('you are now authenticated!');
+  }
+  else
+  {
+    console.warn('invalid password!');
+  }
+});
 ```
 
 ### Getting information about a hash
@@ -88,7 +88,7 @@ last algorithm available with the last set of options.
 ```js
 if (hashy.needsRehash(hash))
 {
-	// Rehash.
+  // Rehash.
 }
 ```
 
