@@ -12,6 +12,14 @@ var bcrypt = require('bcrypt');
 
 //////////////////////////////////////////////////////////////////////
 
+var toString = {}.toString.call.bind({}.toString);
+
+var isFunction = function (val) {
+  return ('[object Function]' === toString(val));
+};
+
+//////////////////////////////////////////////////////////////////////
+
 /**
  * Identifier for the bcrypt algorithm.
  *
@@ -38,6 +46,24 @@ exports.DEFAULT = DEFAULT;
  * @return {object} A Q promise which will receive the hashed password.
  */
 var hash = function (password, algo, options, callback) {
+  if (!isFunction(callback))
+  {
+    if (isFunction(options))
+    {
+      callback = options;
+      options = null;
+    }
+    else if (isFunction(algo))
+    {
+      callback = algo;
+      algo = null;
+    }
+    else
+    {
+      throw new Error('missing callback');
+    }
+  }
+
   algo = algo || DEFAULT;
   options = options || {};
 

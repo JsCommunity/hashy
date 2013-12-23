@@ -35,7 +35,7 @@ First, you may take a look at [the available example](https://github.com/julien-
 ### Creating a hash
 
 ```js
-hashy.hash(password, null, null, function (error, hash) {
+hashy.hash(password, function (error, hash) {
   if (error)
   {
     return console.log(error);
@@ -45,7 +45,7 @@ hashy.hash(password, null, null, function (error, hash) {
 });
 ```
 
-`hash()` handles additionaly two optional parameters:
+`hash()` handles additionaly two parameters which may be passed before the callback:
 
 1. `algo`: which algorithm to use, it defaults to `hashy.DEFAULT`
 which currently equals to `hash.BCRYPT`;

@@ -45,7 +45,7 @@ hashy.verify(password, hash, function (error, success) {
   // fits the current security policies (algorithm & options).
   if (hashy.needsRehash(hash))
   {
-    hashy.hash(password, null, null, function (error, newHash) {
+    hashy.hash(password, function (error, newHash) {
       if (error)
       {
         return console.error(error);
