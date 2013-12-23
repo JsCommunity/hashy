@@ -8,11 +8,6 @@ It has been heavily inspired by the new [PHP password hashing
 API](http://www.php.net/manual/en/book.password.php) but, following
 the node.js philosophy, hashing is done asynchronously.
 
-Furthermore, to make the interfaces as easy to use as possible, async
-functions do not rely on callbacks but return
-[Q](https://github.com/kriskowal/q)
-[promises](https://github.com/kriskowal/q).
-
 ## Why a new library?
 
 The other ones I found were too complicated and/or were missing
