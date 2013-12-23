@@ -1,0 +1,35 @@
+# EditorConfig is awesome: http://EditorConfig.org
+
+# top-most EditorConfig file
+root = true
+
+# Unix-style newlines with a newline ending every file
+#
+# Tab indentation (size of 4 spaces)
+[*]
+charset = utf-8
+end_of_line = lf
+indent_size = 4
+indent_style = tab
+insert_final_newline = true
+trim_trailing_whitespaces = true
+
+# YAML only allows spaces.
+[*.yaml]
+indent_size = 2
+indent_style = space
+
+# Special settings for NPM file.
+[/package.json]
+indent_size = 2
+indent_style = space
+
+# For JavaScript, two spaces seems to be the standard, at least in Node.js (http://nodeguide.com/style.html#tabs-vs-spaces).
+[*.js]
+indent_size = 2
+indent_style = space
+
+# For CoffeeScript files, we follow this Polarmobile style guide (https://github.com/polarmobile/coffeescript-style-guide/blob/master/README.md).
+[*{,.spec}.{,lit}coffee]
+indent_size = 2
+indent_style = space

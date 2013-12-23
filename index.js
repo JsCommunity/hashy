@@ -38,32 +38,32 @@ exports.DEFAULT = DEFAULT;
  * @return {object} A Q promise which will receive the hashed password.
  */
 var hash = function (password, algo, options, callback) {
-	algo = algo || DEFAULT;
-	options = options || {};
+  algo = algo || DEFAULT;
+  options = options || {};
 
-	if (algo === BCRYPT)
-	{
-		// FIXME: default options should be declared somewhere else.
-		var cost = options.cost || 10;
+  if (algo === BCRYPT)
+  {
+    // FIXME: default options should be declared somewhere else.
+    var cost = options.cost || 10;
 
-		return bcrypt.genSalt(cost, function (error, salt) {
-			if (error)
-			{
-				return callback(error);
-			}
+    return bcrypt.genSalt(cost, function (error, salt) {
+      if (error)
+      {
+        return callback(error);
+      }
 
-			bcrypt.hash(password, salt, function (error, result) {
-				if (error)
-				{
-					return callback(error);
-				}
+      bcrypt.hash(password, salt, function (error, result) {
+        if (error)
+        {
+          return callback(error);
+        }
 
-				callback(null, result);
-			});
-		});
-	}
+        callback(null, result);
+      });
+    });
+  }
 
-	callback(new Error('unsupported algorithm'));
+  callback(new Error('unsupported algorithm'));
 };
 exports.hash = hash;
 
@@ -76,23 +76,23 @@ exports.hash = hash;
  *     hash: “algo”: the algorithm used, “options” the options used.
  */
 var getInfo = function (hash) {
-	// What to do with “$2x$” and “$2y$”?
-	if (hash.substring(0, 4) === '$2a$')
-	{
-		return {
-			'algo': BCRYPT,
-			'algoName': 'bcrypt',
-			'options': {
-				'cost': bcrypt.getRounds(hash)
-			}
-		};
-	}
+  // What to do with “$2x$” and “$2y$”?
+  if (hash.substring(0, 4) === '$2a$')
+  {
+    return {
+      'algo': BCRYPT,
+      'algoName': 'bcrypt',
+      'options': {
+        'cost': bcrypt.getRounds(hash)
+      }
+    };
+  }
 
-	return {
-		'algo': 0,
-		'algoName': 'unknown',
-		'options': {}
-	};
+  return {
+    'algo': 0,
+    'algoName': 'unknown',
+    'options': {}
+  };
 };
 exports.getInfo = getInfo;
 
@@ -109,24 +109,24 @@ exports.getInfo = getInfo;
  * @return {boolean} Whether the hash needs to be recomputed.
  */
 var needsRehash = function (hash, algo, options) {
-	algo = algo || DEFAULT;
-	options = options || {};
+  algo = algo || DEFAULT;
+  options = options || {};
 
-	var info = getInfo(hash);
+  var info = getInfo(hash);
 
-	if (info.algo !== algo)
-	{
-		return true;
-	}
+  if (info.algo !== algo)
+  {
+    return true;
+  }
 
-	if (algo === BCRYPT)
-	{
-		var cost = options.cost || 10;
+  if (algo === BCRYPT)
+  {
+    var cost = options.cost || 10;
 
-		return (info.options.cost !== cost);
-	}
+    return (info.options.cost !== cost);
+  }
 
-	return false;
+  return false;
 };
 exports.needsRehash = needsRehash;
 
@@ -139,13 +139,13 @@ exports.needsRehash = needsRehash;
  * @return {object} A Q promise which will receive a boolean.
  */
 var verify = function (password, hash, callback) {
-	var info = getInfo(hash);
+  var info = getInfo(hash);
 
-	if (info.algo === BCRYPT)
-	{
-		return bcrypt.compare(password, hash, callback);
-	}
+  if (info.algo === BCRYPT)
+  {
+    return bcrypt.compare(password, hash, callback);
+  }
 
-	callback(new Error('unsupported algorithm'));
+  callback(new Error('unsupported algorithm'));
 };
 exports.verify = verify;

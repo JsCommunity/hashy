@@ -4,6 +4,8 @@
  * @author Julien Fontanet <julien.fontanet@isonoe.net>
  */
 
+'use strict';
+
 //////////////////////////////////////////////////////////////////////
 
 // To make it work directly from the git repository we are using this
@@ -27,31 +29,31 @@ var password = 'test';
 
 // First we will check whether or not they match.
 hashy.verify(password, hash, function (error, success) {
-	if (error)
-	{
-		return console.error(error);
-	}
+  if (error)
+  {
+    return console.error(error);
+  }
 
-	if (!success)
-	{
-		return console.error('the password is invalid');
-	}
+  if (!success)
+  {
+    return console.error('the password is invalid');
+  }
 
-	console.log('the password has been checked, you are now authenticated!');
+  console.log('the password has been checked, you are now authenticated!');
 
-	// Now we can check if the hash should be recomputed, i.e. if it
-	// fits the current security policies (algorithm & options).
-	if (hashy.needsRehash(hash))
-	{
-		hashy.hash(password, null, null, function (error, new_hash) {
-			if (error)
-			{
-				return console.error(error);
-			}
+  // Now we can check if the hash should be recomputed, i.e. if it
+  // fits the current security policies (algorithm & options).
+  if (hashy.needsRehash(hash))
+  {
+    hashy.hash(password, null, null, function (error, newHash) {
+      if (error)
+      {
+        return console.error(error);
+      }
 
-			hash = new_hash;
+      hash = newHash;
 
-			console.log('the hash has been updated:', hash);
-		});
-	}
+      console.log('the hash has been updated:', hash);
+    });
+  }
 });
