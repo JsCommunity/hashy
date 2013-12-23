@@ -4,10 +4,11 @@
  * @author Julien Fontanet <julien.fontanet@isonoe.net>
  */
 
+'use strict';
+
 //////////////////////////////////////////////////////////////////////
 
-var bcrypt = require('bcryptjs');
-var Q      = require('q');
+var bcrypt = require('bcrypt');
 
 //////////////////////////////////////////////////////////////////////
 
@@ -36,22 +37,33 @@ exports.DEFAULT = DEFAULT;
  *
  * @return {object} A Q promise which will receive the hashed password.
  */
-var hash = function (password, algo, options) {
+var hash = function (password, algo, options, callback) {
 	algo = algo || DEFAULT;
+	options = options || {};
 
 	if (algo === BCRYPT)
 	{
-		return Q.ninvoke(
-			bcrypt,
-			'hash',
-			password,
-			options && options.cost || 10
-		);
+		// FIXME: default options should be declared somewhere else.
+		var cost = options.cost || 10;
+
+		return bcrypt.genSalt(cost, function (error, salt) {
+			if (error)
+			{
+				return callback(error);
+			}
+
+			bcrypt.hash(password, salt, function (error, result) {
+				if (error)
+				{
+					return callback(error);
+				}
+
+				callback(null, result);
+			});
+		});
 	}
 
-	return Q.fcall(function () {
-		throw new Error('unsupported algorithm');
-	});
+	callback(new Error('unsupported algorithm'));
 };
 exports.hash = hash;
 
@@ -98,6 +110,7 @@ exports.getInfo = getInfo;
  */
 var needsRehash = function (hash, algo, options) {
 	algo = algo || DEFAULT;
+	options = options || {};
 
 	var info = getInfo(hash);
 
@@ -108,7 +121,7 @@ var needsRehash = function (hash, algo, options) {
 
 	if (algo === BCRYPT)
 	{
-		var cost = options && options.cost || 10;
+		var cost = options.cost || 10;
 
 		return (info.options.cost !== cost);
 	}
@@ -125,16 +138,14 @@ exports.needsRehash = needsRehash;
  *
  * @return {object} A Q promise which will receive a boolean.
  */
-var verify = function (password, hash) {
+var verify = function (password, hash, callback) {
 	var info = getInfo(hash);
 
 	if (info.algo === BCRYPT)
 	{
-		return Q.ninvoke(bcrypt, 'compare', password, hash);
+		return bcrypt.compare(password, hash, callback);
 	}
 
-	return Q.fcall(function () {
-		throw new Error('unsupported algorithm');
-	});
+	callback(new Error('unsupported algorithm'));
 };
 exports.verify = verify;

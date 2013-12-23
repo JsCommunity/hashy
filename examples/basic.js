@@ -9,7 +9,7 @@
 // To make it work directly from the git repository we are using this
 // require but from your project you should just have to do:
 //     var hashy = require('hashy');
-var hashy = require('../index');
+var hashy = require('..');
 
 //////////////////////////////////////////////////////////////////////
 
@@ -25,31 +25,33 @@ var hash = '$2a$08$3VbKizuJA1RdlRafd48Kfuf/eKE9kPhP8tOoyHFDmmr/rFkV.d/mO';
 // This value will probably be sent by a client (e.g. web browser).
 var password = 'test';
 
-// First we will check whether they match.
-hashy.verify(password, hash)
-	.then(function (result) {
-		if (!result)
-		{
-			throw new Error('the password is invalid');
-			return;
-		}
+// First we will check whether or not they match.
+hashy.verify(password, hash, function (error, success) {
+	if (error)
+	{
+		return console.error(error);
+	}
 
-		// Now we can check if the hash should be recomputed, i.e. if it
-		// fits the current security policies (algorithm & options).
-		if (hashy.needsRehash(hash))
-		{
-			return hashy.hash(password).then(function (new_hash) {
-				hash = new_hash;
+	if (!success)
+	{
+		return console.error('the password is invalid');
+	}
 
-				console.log('the hash has been updated:', hash);
-			});
-		}
-	})
-	.then(function () {
-		console.log('the password has been checked, you are now authenticated!');
-	})
-	.fail(function (error) {
-		console.error(error);
-	})
-	.done()
-;
+	console.log('the password has been checked, you are now authenticated!');
+
+	// Now we can check if the hash should be recomputed, i.e. if it
+	// fits the current security policies (algorithm & options).
+	if (hashy.needsRehash(hash))
+	{
+		hashy.hash(password, null, null, function (error, new_hash) {
+			if (error)
+			{
+				return console.error(error);
+			}
+
+			hash = new_hash;
+
+			console.log('the hash has been updated:', hash);
+		});
+	}
+});
