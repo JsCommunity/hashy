@@ -37,7 +37,7 @@
     "noarg"         : true,     // Prohibit use of `arguments.caller` and `arguments.callee`.
     "noempty"       : true,     // Prohibit use of empty blocks.
     "nonew"         : true,     // Prohibit use of constructors for side-effects.
-    "plusplus"      : true,     // Prohibit use of `++` & `--`.
+    "plusplus"      : false,    // Prohibit the use of `++` & `--`.
     "quotmark"      : "'",      // Require single quotes.
     "undef"         : true,     // Require all non-global variables be declared before they are used.
     "unused"        : true,     // Prohibit unused variables.
@@ -62,7 +62,7 @@
     "es5"           : false,    // Allow EcmaScript 5 syntax.
     "esnext"        : false,    // Allow ES.next specific features such as `const` and `let`.
     "evil"          : false,    // Tolerate use of `eval`.
-    "expr"          : false,    // Tolerate `ExpressionStatement` as Programs.
+    "expr"          : true,     // Tolerate `ExpressionStatement` as Programs. (Allowed for Mocha.)
     "funcscope"     : false,    // Tolerate declarations of variables inside of control structures while accessing them later from the outside.
     "gcl"           : false,    // Makes JSHint compatible with Google Closure Compiler.
     "globalstrict"  : true,     // Allow global "use strict" (also enables 'strict').
@@ -112,5 +112,15 @@
     "nomen"         : false,    // Prohibit use of initial or trailing underbars in names.
     "onevar"        : false,    // Allow only one `var` statement per function.
     "passfail"      : false,    // Stop on first error.
-    "white"         : false     // Check against strict whitespace and indentation rules.
+    "white"         : false,    // Check against strict whitespace and indentation rules.
+
+    "globals": {
+        // Mocha.
+        "after"      : false,
+        "afterEach"  : false,
+        "before"     : false,
+        "beforeEach" : false,
+        "describe"   : false,
+        "it"         : false
+    }
 }

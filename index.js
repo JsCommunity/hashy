@@ -6,19 +6,25 @@
 
 'use strict';
 
-//////////////////////////////////////////////////////////////////////
+//====================================================================
 
-var bcrypt = require('bcrypt');
+var Promise = require('bluebird');
+var bcrypt = Promise.promisifyAll(require('bcrypt'));
 
-//////////////////////////////////////////////////////////////////////
+//====================================================================
+
+var has = Object.prototype.hasOwnProperty;
+has = has.call.bind(has);
 
 var extend = function (target, source) {
-  for (var i = 1, n = arguments.length; i < n; ++i)
+  var i, n, key;
+
+  for (i = 1, n = arguments.length; i < n; ++i)
   {
     source = arguments[i];
-    for (var key in source)
+    for (key in source)
     {
-      if (source.hasOwnProperty(key))
+      if (has(source, key))
       {
         target[key] = source[key];
       }
@@ -30,15 +36,19 @@ var extend = function (target, source) {
 
 //--------------------------------------------------------------------
 
-var toString = {}.toString.call.bind({}.toString);
+var toString = Object.prototype.toString;
+toString = toString.call.bind(toString);
 
-var isFunction = function (val) {
-  return ('[object Function]' === toString(val));
-};
+var isFunction = (function () {
+  var tag = toString(function () {});
+  return function (value) {
+    return (toString(value) === tag);
+  };
+})();
 
-//////////////////////////////////////////////////////////////////////
+//====================================================================
 
-var globalOptions = {}
+var globalOptions = {};
 exports.options = globalOptions;
 
 //--------------------------------------------------------------------
@@ -48,8 +58,7 @@ exports.options = globalOptions;
  *
  * @type {integer}
  */
-var BCRYPT = 1;
-exports.BCRYPT = BCRYPT;
+var BCRYPT = exports.BCRYPT = 1;
 
 globalOptions[BCRYPT] = {
   cost: 10,
@@ -60,8 +69,7 @@ globalOptions[BCRYPT] = {
  *
  * @type {integer}
  */
-var DEFAULT = BCRYPT;
-exports.DEFAULT = DEFAULT;
+var DEFAULT = exports.DEFAULT = BCRYPT;
 
 //--------------------------------------------------------------------
 
@@ -71,8 +79,9 @@ exports.DEFAULT = DEFAULT;
  * @param {string} password The password to hash.
  * @param {integer} algo Identifier of the algorithm to use.
  * @param {object} options Options for the algorithm.
+ * @param {function} callback Optional callback.
  *
- * @return {object} A Q promise which will receive the hashed password.
+ * @return {object} A promise which will receive the hashed password.
  */
 var hash = function (password, algo, options, callback) {
   if (!isFunction(callback))
@@ -87,10 +96,6 @@ var hash = function (password, algo, options, callback) {
       callback = algo;
       algo = null;
     }
-    else
-    {
-      throw new Error('missing callback');
-    }
   }
 
   algo = algo || DEFAULT;
@@ -99,24 +104,12 @@ var hash = function (password, algo, options, callback) {
   {
     options = extend({}, options, globalOptions[BCRYPT]);
 
-    return bcrypt.genSalt(options.cost, function (error, salt) {
-      if (error)
-      {
-        return callback(error);
-      }
-
-      bcrypt.hash(password, salt, function (error, result) {
-        if (error)
-        {
-          return callback(error);
-        }
-
-        callback(null, result);
-      });
-    });
+    return bcrypt.genSalt(options.cost).then(function (salt) {
+      return bcrypt.hash(password, salt);
+    }).nodeify(callback);
   }
 
-  callback(new Error('unsupported algorithm'));
+  return Promise.reject(new Error('unsupported algorithm')).nodeify(callback);
 };
 exports.hash = hash;
 
@@ -187,17 +180,18 @@ exports.needsRehash = needsRehash;
  *
  * @param {string} password The password.
  * @param {string} hash The hash.
+ * @param {function} callback Optional callback.
  *
- * @return {object} A Q promise which will receive a boolean.
+ * @return {object} A promise which will receive a boolean.
  */
 var verify = function (password, hash, callback) {
   var info = getInfo(hash);
 
   if (info.algo === BCRYPT)
   {
-    return bcrypt.compare(password, hash, callback);
+    return bcrypt.compare(password, hash).nodeify(callback);
   }
 
-  callback(new Error('unsupported algorithm'));
+  return Promise.reject(new Error('unsupported algorithm')).nodeify(callback);
 };
 exports.verify = verify;
