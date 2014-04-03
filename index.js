@@ -36,15 +36,22 @@ var extend = function (target, source) {
 
 //--------------------------------------------------------------------
 
-var toString = Object.prototype.toString;
-toString = toString.call.bind(toString);
-
 var isFunction = (function () {
+  var toString = Object.prototype.toString;
+  toString = toString.call.bind(toString);
+
   var tag = toString(function () {});
+
   return function (value) {
     return (toString(value) === tag);
   };
 })();
+
+//--------------------------------------------------------------------
+
+var error = function (value, callback) {
+  return Promise.reject(new Error(value)).nodeify(callback);
+};
 
 //====================================================================
 
@@ -83,7 +90,7 @@ var DEFAULT = exports.DEFAULT = BCRYPT;
  *
  * @return {object} A promise which will receive the hashed password.
  */
-var hash = function (password, algo, options, callback) {
+exports.hash = function (password, algo, options, callback) {
   if (!isFunction(callback))
   {
     if (isFunction(options))
@@ -104,14 +111,13 @@ var hash = function (password, algo, options, callback) {
   {
     options = extend({}, options, globalOptions[BCRYPT]);
 
-    return bcrypt.genSalt(options.cost).then(function (salt) {
-      return bcrypt.hash(password, salt);
+    return bcrypt.genSaltAsync(options.cost).then(function (salt) {
+      return bcrypt.hashAsync(password, salt);
     }).nodeify(callback);
   }
 
-  return Promise.reject(new Error('unsupported algorithm')).nodeify(callback);
+  return error('unsupported algorithm', callback);
 };
-exports.hash = hash;
 
 /**
  * Returns information about a hash.
@@ -121,26 +127,25 @@ exports.hash = hash;
  * @return {object} Object containing information about the given
  *     hash: “algo”: the algorithm used, “options” the options used.
  */
-var getInfo = function (hash) {
+var getInfo = exports.getInfo = function (hash) {
   // What to do with “$2x$” and “$2y$”?
   if (hash.substring(0, 4) === '$2a$')
   {
     return {
-      'algo': BCRYPT,
-      'algoName': 'bcrypt',
-      'options': {
-        'cost': bcrypt.getRounds(hash)
+      algo: BCRYPT,
+      algoName: 'bcrypt',
+      options: {
+        cost: bcrypt.getRounds(hash)
       }
     };
   }
 
   return {
-    'algo': 0,
-    'algoName': 'unknown',
-    'options': {}
+    algo: 0,
+    algoName: 'unknown',
+    options: {}
   };
 };
-exports.getInfo = getInfo;
 
 /**
  * Checks whether the hash needs to be recomputed.
@@ -154,7 +159,7 @@ exports.getInfo = getInfo;
  *
  * @return {boolean} Whether the hash needs to be recomputed.
  */
-var needsRehash = function (hash, algo, options) {
+exports.needsRehash = function (hash, algo, options) {
   algo = algo || DEFAULT;
 
   var info = getInfo(hash);
@@ -173,7 +178,6 @@ var needsRehash = function (hash, algo, options) {
 
   return false;
 };
-exports.needsRehash = needsRehash;
 
 /**
  * Checks whether the password and the hash match.
@@ -184,14 +188,13 @@ exports.needsRehash = needsRehash;
  *
  * @return {object} A promise which will receive a boolean.
  */
-var verify = function (password, hash, callback) {
+exports.verify = function (password, hash, callback) {
   var info = getInfo(hash);
 
   if (info.algo === BCRYPT)
   {
-    return bcrypt.compare(password, hash).nodeify(callback);
+    return bcrypt.compareAsync(password, hash).nodeify(callback);
   }
 
-  return Promise.reject(new Error('unsupported algorithm')).nodeify(callback);
+  return error('unsupported algorithm', callback);
 };
-exports.verify = verify;

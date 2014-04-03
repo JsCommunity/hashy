@@ -1,25 +1,27 @@
 {
   "name": "hashy",
   "version": "0.2.1",
-  "description": "Create, check and update password hashes.",
   "license": "MIT",
+  "description": "Create, check and update password hashes.",
   "keywords": [
     "password",
     "hash"
   ],
+  "homepage": "https://github.com/julien-f/nodejs-hashy",
+  "bugs": "https://github.com/julien-f/nodejs-hashy/issues",
   "author": {
     "name": "Julien Fontanet",
     "email": "julien.fontanet@isonoe.net",
     "url": "http://julien.isonoe.net"
   },
-  "contributors": [],
-  "homepage": "https://github.com/julien-f/nodejs-hashy",
-  "bugs": "https://github.com/julien-f/nodejs-hashy",
+  "directories": {
+    "bin": "./bin",
+    "man": "./man"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/julien-f/nodejs-hashy"
   },
-  "main": "index",
   "dependencies": {
     "bcrypt": "~0.7.7",
     "bluebird": "^1.1.0"

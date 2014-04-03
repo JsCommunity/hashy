@@ -1,5 +1,9 @@
 # Hashy
 
+[![Build Status](https://img.shields.io/travis/julien-f/nodejs-hashy/master.svg)](http://travis-ci.org/julien-f/nodejs-hashy)
+[![Dependency Status](https://david-dm.org/julien-f/nodejs-hashy/status.svg?theme=shields.io)](https://david-dm.org/julien-f/nodejs-hashy)
+[![devDependency Status](https://david-dm.org/julien-f/nodejs-hashy/dev-status.svg?theme=shields.io)](https://david-dm.org/julien-f/nodejs-hashy#info=devDependencies)
+
 Hashy is small [node.js](http://nodejs.org/) library which aims to do
 passwords hashing *[the correct
 way](https://wiki.php.net/rfc/password_hash)*.
