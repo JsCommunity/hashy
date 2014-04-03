@@ -12,6 +12,12 @@ It has been heavily inspired by the new [PHP password hashing
 API](http://www.php.net/manual/en/book.password.php) but, following
 the node.js philosophy, hashing is done asynchronously.
 
+Furthermore, to make the interfaces as easy to use as possible, async
+functions can either be used with callbacks or they return
+[promises](https://en.wikipedia.org/wiki/Promise_%28programming%29)
+which will make them super easy to work with [generators](https://gith
+ub.com/petkaantonov/bluebird/blob/master/API.md#generators)!
+
 ## Why a new library?
 
 The other ones I found were too complicated and/or were missing
@@ -94,13 +100,63 @@ if (hashy.needsRehash(hash))
 It handles the optional `algo` and `options` parameters like
 [`hash()`](#creating-a-hash).
 
-# Changing default options.
+### Changing default options.
 
 The default options for a given algorithm is available at `hashy.options[&gt;algo&lt;]`.
 
 ```js
 // Sets the default cost for bcrypt to 12.
 hashy.options[hashy.BCRYPT].cost = 12.
+```
+
+## Using promises
+
+Same interface as above but without the callbacks!
+
+```javascript
+// Hashing.
+hashy.hash(password).then(function (hash) {
+  console.log('generated hash:' hash);
+});
+
+// Checking.
+hashy.verify(password, hash).then(function (success) {
+  if (success)
+  {
+    console.log('you are now authenticated!');
+  }
+  else
+  {
+    console.warn('invalid password!');
+  }
+});
+
+```
+
+As you can see, you don't even have to handle errors if you don't want
+to!
+
+## Using generators
+
+**Note:** only available since node.js 0.12.
+
+Same interface as promises but much more similar to a synchronous
+code!
+
+```javascript
+// Hashing.
+var hash = yield hashy.hash(password);
+console.log('generated hash:', hash);
+
+// Checking.
+if (yield hashy.verify(password, hash))
+{
+  console.log('you are now authenticated!');
+}
+else
+{
+  console.warn('invalid password!');
+}
 ```
 
 ## License

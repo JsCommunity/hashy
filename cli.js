@@ -13,6 +13,8 @@ var hashy = require('./');
 module.exports = function cli(argv) {
   var options = yargs
     .usage('Usage: $0 [<option>...]')
+    .example('$0 <secret>', 'hash the secret')
+    .example('$0 <secret> <hash>', 'verify the secret using the hash')
     .options({
       h: {
         alias: 'help',

@@ -14,8 +14,10 @@
     "email": "julien.fontanet@isonoe.net",
     "url": "http://julien.isonoe.net"
   },
+  "main": "./lib",
   "directories": {
     "bin": "./bin",
+    "example": "./examples",
     "man": "./man"
   },
   "repository": {
@@ -24,7 +26,8 @@
   },
   "dependencies": {
     "bcrypt": "~0.7.7",
-    "bluebird": "^1.2.1"
+    "bluebird": "^1.2.1",
+    "yargs": "^1.2.1"
   },
   "devDependencies": {
     "chai": "^1.9.1",
