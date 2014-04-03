@@ -14,7 +14,6 @@
     "email": "julien.fontanet@isonoe.net",
     "url": "http://julien.isonoe.net"
   },
-  "main": "./lib",
   "directories": {
     "bin": "./bin",
     "example": "./examples",
