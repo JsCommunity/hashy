@@ -27,20 +27,18 @@ module.exports = function cli(argv) {
         describe: 'display the version number',
       },
     })
-    .check(function (options) {
-      if (options.help)
-      {
-        throw '';
-      }
-    })
     .parse(argv)
   ;
+
+  if (options.help)
+  {
+    return yargs.help();
+  }
 
   if (options.version)
   {
     var pkg = require('./package');
-    console.log('Hashy version '+ pkg.version);
-    return;
+    return 'Hashy version '+ pkg.version;
   }
 
   var args = options._;
