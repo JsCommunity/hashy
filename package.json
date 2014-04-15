@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "bcrypt": "~0.7.7",
-    "bluebird": "^1.2.1",
+    "bluebird": "^1.2.2",
     "yargs": "^1.2.1"
   },
   "devDependencies": {
