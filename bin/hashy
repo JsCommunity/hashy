@@ -4,37 +4,4 @@
 
 //====================================================================
 
-var Promise = require('bluebird');
-
-//====================================================================
-
-var isNumber = (function () {
-  var toString = Object.prototype.toString;
-  toString = toString.call.bind(toString);
-
-  var tag = toString(0);
-
-  return function (value) {
-    return (toString(value) === tag);
-  };
-})();
-
-//====================================================================
-
-Promise.try(
-  require('../cli'),
-  [process.argv.slice(2)]
-).then(function (value) {
-  if (value)
-  {
-    console.log(value);
-  }
-}).catch(function (error) {
-  if (isNumber(error))
-  {
-    return process.exit(error);
-  }
-
-  console.error(error.stack || error);
-  process.exit(1);
-});
+require('exec-promise')(require('../cli'));
