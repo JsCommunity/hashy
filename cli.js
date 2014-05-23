@@ -3,6 +3,17 @@
 //====================================================================
 
 var yargs = require('yargs');
+// TESTABILITY: makes yargs throws instead of exiting.
+yargs.fail(function (msg) {
+  var help = yargs.help();
+
+  if (msg)
+  {
+    help += '\n' + msg;
+  }
+
+  throw help;
+});
 
 //--------------------------------------------------------------------
 

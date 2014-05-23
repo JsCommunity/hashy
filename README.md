@@ -159,6 +159,17 @@ else
 }
 ```
 
+## Contributing
+
+Contributions are *very* welcome, either on the documentation or on
+the code.
+
+You may:
+
+- report any [issue](https://github.com/julien-f/nodejs-hashy/issues)
+  you've encountered;
+- fork and create a pull request.
+
 ## License
 
 Hashy is released under the [MIT
