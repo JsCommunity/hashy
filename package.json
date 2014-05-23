@@ -37,8 +37,8 @@
     "test": "mocha index.spec.js"
   },
   "files": [
-    "./index.js",
-    "./cli.js",
-    "./bin"
+    "index.js",
+    "cli.js",
+    "bin"
   ]
 }
