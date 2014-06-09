@@ -25,13 +25,13 @@
   },
   "dependencies": {
     "bcrypt": "~0.7.8",
-    "bluebird": "^1.2.4",
-    "exec-promise": "^0.2.4",
+    "bluebird": "^2.0.7",
+    "exec-promise": "^0.3.0",
     "yargs": "^1.2.2"
   },
   "devDependencies": {
     "chai": "^1.9.1",
-    "mocha": "^1.19.0"
+    "mocha": "^1.20.1"
   },
   "scripts": {
     "test": "mocha index.spec.js"
