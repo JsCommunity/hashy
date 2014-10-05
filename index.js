@@ -16,7 +16,7 @@ var bcrypt = Promise.promisifyAll(require('bcrypt'));
 var has = Object.prototype.hasOwnProperty;
 has = has.call.bind(has);
 
-var extend = function (target, source) {
+function assign(target, source) {
   var i, n, key;
 
   for (i = 1, n = arguments.length; i < n; ++i)
@@ -32,7 +32,7 @@ var extend = function (target, source) {
   }
 
   return target;
-};
+}
 
 //--------------------------------------------------------------------
 
@@ -42,16 +42,16 @@ var isFunction = (function () {
 
   var tag = toString(function () {});
 
-  return function (value) {
+  return function isFunction(value) {
     return (toString(value) === tag);
   };
 })();
 
 //--------------------------------------------------------------------
 
-var error = function (value, callback) {
+function error(value, callback) {
   return Promise.reject(new Error(value)).nodeify(callback);
-};
+}
 
 //====================================================================
 
@@ -90,7 +90,7 @@ var DEFAULT = exports.DEFAULT = BCRYPT;
  *
  * @return {object} A promise which will receive the hashed password.
  */
-exports.hash = function (password, algo, options, callback) {
+function hash(password, algo, options, callback) {
   if (!isFunction(callback))
   {
     if (isFunction(options))
@@ -109,7 +109,7 @@ exports.hash = function (password, algo, options, callback) {
 
   if (algo === BCRYPT)
   {
-    options = extend({}, options, globalOptions[BCRYPT]);
+    options = assign({}, options, globalOptions[BCRYPT]);
 
     return bcrypt.genSaltAsync(options.cost).then(function (salt) {
       return bcrypt.hashAsync(password, salt);
@@ -117,7 +117,8 @@ exports.hash = function (password, algo, options, callback) {
   }
 
   return error('unsupported algorithm', callback);
-};
+}
+exports.hash = hash;
 
 /**
  * Returns information about a hash.
@@ -127,7 +128,7 @@ exports.hash = function (password, algo, options, callback) {
  * @return {object} Object containing information about the given
  *     hash: “algo”: the algorithm used, “options” the options used.
  */
-var getInfo = exports.getInfo = function (hash) {
+function getInfo(hash) {
   // What to do with “$2x$” and “$2y$”?
   if (hash.substring(0, 4) === '$2a$')
   {
@@ -145,7 +146,8 @@ var getInfo = exports.getInfo = function (hash) {
     algoName: 'unknown',
     options: {}
   };
-};
+}
+exports.getInfo = getInfo;
 
 /**
  * Checks whether the hash needs to be recomputed.
@@ -159,7 +161,7 @@ var getInfo = exports.getInfo = function (hash) {
  *
  * @return {boolean} Whether the hash needs to be recomputed.
  */
-exports.needsRehash = function (hash, algo, options) {
+function needsRehash(hash, algo, options) {
   algo = algo || DEFAULT;
 
   var info = getInfo(hash);
@@ -171,13 +173,14 @@ exports.needsRehash = function (hash, algo, options) {
 
   if (algo === BCRYPT)
   {
-    options = extend({}, options, globalOptions[BCRYPT]);
+    options = assign({}, options, globalOptions[BCRYPT]);
 
     return (info.options.cost !== options.cost);
   }
 
   return false;
-};
+}
+exports.needsRehash = needsRehash;
 
 /**
  * Checks whether the password and the hash match.
@@ -188,7 +191,7 @@ exports.needsRehash = function (hash, algo, options) {
  *
  * @return {object} A promise which will receive a boolean.
  */
-exports.verify = function (password, hash, callback) {
+function verify(password, hash, callback) {
   var info = getInfo(hash);
 
   if (info.algo === BCRYPT)
@@ -197,4 +200,5 @@ exports.verify = function (password, hash, callback) {
   }
 
   return error('unsupported algorithm', callback);
-};
+}
+exports.verify = verify;
