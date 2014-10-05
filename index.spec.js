@@ -7,7 +7,7 @@ var hashy = require('./');
 //--------------------------------------------------------------------
 
 var expect = require('chai').expect;
-var Promise = require('bluebird');
+var Bluebird = require('bluebird');
 
 //====================================================================
 
@@ -39,7 +39,7 @@ describe('hash()', function () {
   });
 
   it('does not creates the same hash twice', function () {
-    return Promise.all([
+    return Bluebird.all([
       hash('test'),
       hash('test'),
     ]).spread(function (hash1, hash2) {
