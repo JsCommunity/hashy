@@ -14,10 +14,11 @@
     "email": "julien.fontanet@isonoe.net",
     "url": "http://julien.isonoe.net"
   },
+  "bin": {
+    "hashy": "cli.js"
+  },
   "directories": {
-    "bin": "./bin",
-    "example": "./examples",
-    "man": "./man"
+    "example": "./examples"
   },
   "repository": {
     "type": "git",

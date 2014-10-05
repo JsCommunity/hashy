@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 'use strict';
 
 //====================================================================
@@ -21,11 +23,11 @@ var hashy = require('./');
 
 //====================================================================
 
-module.exports = function cli(argv) {
+function main(argv) {
   var options = yargs
-    .usage('Usage: $0 [<option>...]')
-    .example('$0 <secret>', 'hash the secret')
-    .example('$0 <secret> <hash>', 'verify the secret using the hash')
+    .usage('Usage: hashy [<option>...]')
+    .example('hashy <secret>', 'hash the secret')
+    .example('hashy <secret> <hash>', 'verify the secret using the hash')
     .options({
       h: {
         alias: 'help',
@@ -72,4 +74,11 @@ module.exports = function cli(argv) {
   }
 
   throw 'incorrect number of arguments';
-};
+}
+exports = module.exports = main;
+
+//====================================================================
+
+if (!module.parent) {
+  require('exec-promise')(main);
+}
