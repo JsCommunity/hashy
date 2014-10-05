@@ -8,8 +8,8 @@
 
 //====================================================================
 
-var Promise = require('bluebird');
-var bcrypt = Promise.promisifyAll(require('bcrypt'));
+var Bluebird = require('bluebird');
+var bcrypt = Bluebird.promisifyAll(require('bcrypt'));
 
 //====================================================================
 
@@ -50,7 +50,7 @@ var isFunction = (function () {
 //--------------------------------------------------------------------
 
 function error(value, callback) {
-  return Promise.reject(new Error(value)).nodeify(callback);
+  return Bluebird.reject(new Error(value)).nodeify(callback);
 }
 
 //====================================================================
