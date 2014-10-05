@@ -47,8 +47,21 @@ var isFunction = (function () {
 
 //--------------------------------------------------------------------
 
-function error(value, callback) {
-  return Bluebird.reject(new Error(value)).nodeify(callback);
+var slice = Array.prototype.slice;
+
+// Similar to Bluebird.method(fn) but handle Node callbacks.
+function makeAsyncWrapper(fn) {
+  return function asyncWrapper() {
+    var args = slice.call(arguments);
+    var callback;
+
+    var n = args.length;
+    if (n && isFunction(args[--n])) {
+      callback = args.pop();
+    }
+
+    return Bluebird.try(fn, args, this).nodeify(callback);
+  };
 }
 
 //====================================================================
@@ -88,35 +101,20 @@ var DEFAULT = exports.DEFAULT = BCRYPT;
  *
  * @return {object} A promise which will receive the hashed password.
  */
-function hash(password, algo, options, callback) {
-  if (!isFunction(callback))
-  {
-    if (isFunction(options))
-    {
-      callback = options;
-      options = null;
-    }
-    else if (isFunction(algo))
-    {
-      callback = algo;
-      algo = null;
-    }
-  }
-
+function hash(password, algo, options) {
   algo = algo || DEFAULT;
 
   if (algo === BCRYPT)
   {
     options = assign({}, options, globalOptions[BCRYPT]);
-
     return bcrypt.genSaltAsync(options.cost).then(function (salt) {
       return bcrypt.hashAsync(password, salt);
-    }).nodeify(callback);
+    });
   }
 
-  return error('unsupported algorithm', callback);
+  throw new Error('unsupported algorithm');
 }
-exports.hash = hash;
+exports.hash = makeAsyncWrapper(hash);
 
 /**
  * Returns information about a hash.
@@ -189,14 +187,14 @@ exports.needsRehash = needsRehash;
  *
  * @return {object} A promise which will receive a boolean.
  */
-function verify(password, hash, callback) {
+function verify(password, hash) {
   var info = getInfo(hash);
 
   if (info.algo === BCRYPT)
   {
-    return bcrypt.compareAsync(password, hash).nodeify(callback);
+    return bcrypt.compareAsync(password, hash);
   }
 
-  return error('unsupported algorithm', callback);
+  throw new Error('unsupported algorithm');
 }
-exports.verify = verify;
+exports.verify = makeAsyncWrapper(verify);
