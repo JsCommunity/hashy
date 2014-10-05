@@ -14,7 +14,6 @@ var bcrypt = Bluebird.promisifyAll(require('bcrypt'));
 //====================================================================
 
 var has = Object.prototype.hasOwnProperty;
-has = has.call.bind(has);
 
 function assign(target, source) {
   var i, n, key;
@@ -24,7 +23,7 @@ function assign(target, source) {
     source = arguments[i];
     for (key in source)
     {
-      if (has(source, key))
+      if (has.call(source, key))
       {
         target[key] = source[key];
       }
@@ -38,12 +37,11 @@ function assign(target, source) {
 
 var isFunction = (function () {
   var toString = Object.prototype.toString;
-  toString = toString.call.bind(toString);
 
-  var tag = toString(function () {});
+  var tag = toString.call(function () {});
 
   return function isFunction(value) {
-    return (toString(value) === tag);
+    return (toString.call(value) === tag);
   };
 })();
 
