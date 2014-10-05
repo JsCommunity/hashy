@@ -107,9 +107,7 @@ function hash(password, algo, options) {
   if (algo === BCRYPT)
   {
     options = assign({}, options, globalOptions[BCRYPT]);
-    return bcrypt.genSaltAsync(options.cost).then(function (salt) {
-      return bcrypt.hashAsync(password, salt);
-    });
+    return bcrypt.hashAsync(password, options.cost);
   }
 
   throw new Error('unsupported algorithm');
