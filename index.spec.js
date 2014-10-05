@@ -8,6 +8,7 @@ var hashy = require('./');
 
 var expect = require('chai').expect;
 var Bluebird = require('bluebird');
+Bluebird.longStackTraces();
 
 //====================================================================
 
