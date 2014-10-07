@@ -1,6 +1,6 @@
 {
   "name": "hashy",
-  "version": "0.3.7",
+  "version": "0.4.0",
   "license": "MIT",
   "description": "Create, check and update password hashes.",
   "keywords": [
