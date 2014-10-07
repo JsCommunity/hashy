@@ -71,23 +71,11 @@ exports.options = globalOptions;
 
 //--------------------------------------------------------------------
 
-/**
- * Identifier for the bcrypt algorithm.
- *
- * @type {integer}
- */
-var BCRYPT = exports.BCRYPT = 1;
+var DEFAULT_ALGO = 'bcrypt';
 
-globalOptions[BCRYPT] = {
+globalOptions.bcrypt = {
   cost: 10,
 };
-
-/**
- * Default algorithm to use for hashing.
- *
- * @type {integer}
- */
-var DEFAULT = exports.DEFAULT = BCRYPT;
 
 //--------------------------------------------------------------------
 
@@ -102,11 +90,11 @@ var DEFAULT = exports.DEFAULT = BCRYPT;
  * @return {object} A promise which will receive the hashed password.
  */
 function hash(password, algo, options) {
-  algo = algo || DEFAULT;
+  algo || (algo = DEFAULT_ALGO);
 
-  if (algo === BCRYPT)
+  if (algo === 'bcrypt')
   {
-    options = assign({}, options, globalOptions[BCRYPT]);
+    options = assign({}, options, globalOptions.bcrypt);
     return bcrypt.hashAsync(password, options.cost);
   }
 
@@ -127,8 +115,7 @@ function getInfo(hash) {
   if (hash.substring(0, 4) === '$2a$')
   {
     return {
-      algo: BCRYPT,
-      algoName: 'bcrypt',
+      algo: 'bcrypt',
       options: {
         cost: bcrypt.getRounds(hash)
       }
@@ -136,8 +123,7 @@ function getInfo(hash) {
   }
 
   return {
-    algo: 0,
-    algoName: 'unknown',
+    algo: 'unknown',
     options: {}
   };
 }
@@ -156,18 +142,18 @@ exports.getInfo = getInfo;
  * @return {boolean} Whether the hash needs to be recomputed.
  */
 function needsRehash(hash, algo, options) {
-  algo = algo || DEFAULT;
-
   var info = getInfo(hash);
+
+  algo || (algo = DEFAULT_ALGO);
 
   if (info.algo !== algo)
   {
     return true;
   }
 
-  if (algo === BCRYPT)
+  if (algo === 'bcrypt')
   {
-    options = assign({}, options, globalOptions[BCRYPT]);
+    options = assign({}, options, globalOptions.bcrypt);
 
     return (info.options.cost < options.cost);
   }
@@ -188,7 +174,7 @@ exports.needsRehash = needsRehash;
 function verify(password, hash) {
   var info = getInfo(hash);
 
-  if (info.algo === BCRYPT)
+  if (info.algo === 'bcrypt')
   {
     return bcrypt.compareAsync(password, hash);
   }

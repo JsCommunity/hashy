@@ -17,8 +17,7 @@ var data = [
     value: 'password',
     hash: '$2a$10$3F2S0bh8CO8aVzW/tqyjI.iVQnLNea1YIpNSpS8dmJwUVNXP3D4/y',
     info: {
-      algo: hashy.BCRYPT,
-      algoName: 'bcrypt',
+      algo: 'bcrypt',
       options: {
         cost: 10,
       },
