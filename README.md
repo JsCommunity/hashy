@@ -105,7 +105,7 @@ The default options for a given algorithm is available at `hashy.options[&gt;alg
 
 ```js
 // Sets the default cost for bcrypt to 12.
-hashy.options[hashy.BCRYPT].cost = 12.
+hashy.options.bcrypt.cost = 12.
 ```
 
 ## Using promises
