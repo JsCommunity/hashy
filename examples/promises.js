@@ -25,8 +25,7 @@ var password = 'test';
 hashy.verify(password, hash).then(function (success) {
   if (!success)
   {
-    console.error('the password is invalid');
-    return;
+    throw new Error('the password is invalid');
   }
 
   console.log('the password has been checked, you are now authenticated!');

@@ -35,7 +35,7 @@ a new hash for this password.
 
 ## How to use it?
 
-First, you may take a look at [the available example](https://github.com/julien-f/nodejs-hashy/blob/master/examples/basic.js).
+First, you may take a look at examples: using [callbacks](https://github.com/julien-f/nodejs-hashy/blob/master/examples/callbacks.js), [promises](https://github.com/julien-f/nodejs-hashy/blob/master/examples/promises.js) or [generators](https://github.com/julien-f/nodejs-hashy/blob/master/examples/generators.js) (requires Node >= 0.11).
 
 ### Creating a hash
 
