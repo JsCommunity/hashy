@@ -22,15 +22,11 @@ var hash = '$2a$08$3VbKizuJA1RdlRafd48Kfuf/eKE9kPhP8tOoyHFDmmr/rFkV.d/mO';
 var password = 'test';
 
 // First we will check whether or not they match.
-hashy.verify(password, hash, function (error, success) {
-  if (error)
-  {
-    return console.error(error);
-  }
-
+hashy.verify(password, hash).then(function (success) {
   if (!success)
   {
-    return console.error('the password is invalid');
+    console.error('the password is invalid');
+    return;
   }
 
   console.log('the password has been checked, you are now authenticated!');
@@ -39,15 +35,13 @@ hashy.verify(password, hash, function (error, success) {
   // fits the current security policies (algorithm & options).
   if (hashy.needsRehash(hash))
   {
-    hashy.hash(password, function (error, newHash) {
-      if (error)
-      {
-        return console.error(error);
-      }
-
+    return hashy.hash(password).then(function (newHash) {
       hash = newHash;
 
       console.log('the hash has been updated:', hash);
     });
   }
+}).catch(function (error) {
+  // Display any error that might have happened in the chain.
+  console.error(error);
 });
