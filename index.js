@@ -169,7 +169,7 @@ function needsRehash(hash, algo, options) {
   {
     options = assign({}, options, globalOptions[BCRYPT]);
 
-    return (info.options.cost !== options.cost);
+    return (info.options.cost < options.cost);
   }
 
   return false;
