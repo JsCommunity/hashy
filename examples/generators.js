@@ -36,7 +36,7 @@ Bluebird.coroutine(function *() {
 
   // Now we can check if the hash should be recomputed, i.e. if it
   // fits the current security policies (algorithm & options).
-  if (yield hashy.needsRehash(hash))
+  if (hashy.needsRehash(hash))
   {
     hash = yield hashy.hash(password);
 
