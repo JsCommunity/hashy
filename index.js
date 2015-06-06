@@ -4,80 +4,77 @@
  * @author Julien Fontanet <julien.fontanet@isonoe.net>
  */
 
-'use strict';
+'use strict'
 
-//====================================================================
+// ===================================================================
 
-var Bluebird = require('bluebird');
-var bcrypt = Bluebird.promisifyAll(require('bcrypt'));
+var Bluebird = require('bluebird')
+var bcrypt = Bluebird.promisifyAll(require('bcrypt'))
 
-//====================================================================
+// ===================================================================
 
-var has = Object.prototype.hasOwnProperty;
+var has = Object.prototype.hasOwnProperty
 
-function assign(target, source) {
-  var i, n, key;
+function assign (target, source) {
+  var i, n, key
 
-  for (i = 1, n = arguments.length; i < n; ++i)
-  {
-    source = arguments[i];
-    for (key in source)
-    {
-      if (has.call(source, key))
-      {
-        target[key] = source[key];
+  for (i = 1, n = arguments.length; i < n; ++i) {
+    source = arguments[i]
+    for (key in source) {
+      if (has.call(source, key)) {
+        target[key] = source[key]
       }
     }
   }
 
-  return target;
+  return target
 }
 
-//--------------------------------------------------------------------
+// -------------------------------------------------------------------
 
 var isFunction = (function () {
-  var toString = Object.prototype.toString;
+  var toString = Object.prototype.toString
 
-  var tag = toString.call(function () {});
+  var tag = toString.call(function () {})
 
-  return function isFunction(value) {
-    return (toString.call(value) === tag);
-  };
-})();
+  return function isFunction (value) {
+    return (toString.call(value) === tag)
+  }
+})()
 
-//--------------------------------------------------------------------
+// -------------------------------------------------------------------
 
-var slice = Array.prototype.slice;
+var slice = Array.prototype.slice
 
 // Similar to Bluebird.method(fn) but handle Node callbacks.
-function makeAsyncWrapper(fn) {
-  return function asyncWrapper() {
-    var args = slice.call(arguments);
-    var callback;
+function makeAsyncWrapper (fn) {
+  return function asyncWrapper () {
+    var args = slice.call(arguments)
+    var callback
 
-    var n = args.length;
+    var n = args.length
     if (n && isFunction(args[--n])) {
-      callback = args.pop();
+      callback = args.pop()
     }
 
-    return Bluebird.try(fn, args, this).nodeify(callback);
-  };
+    return Bluebird.try(fn, args, this).nodeify(callback)
+  }
 }
 
-//====================================================================
+// ===================================================================
 
-var globalOptions = {};
-exports.options = globalOptions;
+var globalOptions = {}
+exports.options = globalOptions
 
-//--------------------------------------------------------------------
+// -------------------------------------------------------------------
 
-var DEFAULT_ALGO = 'bcrypt';
+var DEFAULT_ALGO = 'bcrypt'
 
 globalOptions.bcrypt = {
-  cost: 10,
-};
+  cost: 10
+}
 
-//--------------------------------------------------------------------
+// -------------------------------------------------------------------
 
 /**
  * Hashes a password.
@@ -89,18 +86,17 @@ globalOptions.bcrypt = {
  *
  * @return {object} A promise which will receive the hashed password.
  */
-function hash(password, algo, options) {
-  algo || (algo = DEFAULT_ALGO);
+function hash (password, algo, options) {
+  algo || (algo = DEFAULT_ALGO)
 
-  if (algo === 'bcrypt')
-  {
-    options = assign({}, options, globalOptions.bcrypt);
-    return bcrypt.hashAsync(password, options.cost);
+  if (algo === 'bcrypt') {
+    options = assign({}, options, globalOptions.bcrypt)
+    return bcrypt.hashAsync(password, options.cost)
   }
 
-  throw new Error('unsupported algorithm');
+  throw new Error('unsupported algorithm')
 }
-exports.hash = makeAsyncWrapper(hash);
+exports.hash = makeAsyncWrapper(hash)
 
 /**
  * Returns information about a hash.
@@ -110,24 +106,23 @@ exports.hash = makeAsyncWrapper(hash);
  * @return {object} Object containing information about the given
  *     hash: “algo”: the algorithm used, “options” the options used.
  */
-function getInfo(hash) {
+function getInfo (hash) {
   // What to do with “$2x$” and “$2y$”?
-  if (hash.substring(0, 4) === '$2a$')
-  {
+  if (hash.substring(0, 4) === '$2a$') {
     return {
       algo: 'bcrypt',
       options: {
         cost: bcrypt.getRounds(hash)
       }
-    };
+    }
   }
 
   return {
     algo: 'unknown',
     options: {}
-  };
+  }
 }
-exports.getInfo = getInfo;
+exports.getInfo = getInfo
 
 /**
  * Checks whether the hash needs to be recomputed.
@@ -141,26 +136,24 @@ exports.getInfo = getInfo;
  *
  * @return {boolean} Whether the hash needs to be recomputed.
  */
-function needsRehash(hash, algo, options) {
-  var info = getInfo(hash);
+function needsRehash (hash, algo, options) {
+  var info = getInfo(hash)
 
-  algo || (algo = DEFAULT_ALGO);
+  algo || (algo = DEFAULT_ALGO)
 
-  if (info.algo !== algo)
-  {
-    return true;
+  if (info.algo !== algo) {
+    return true
   }
 
-  if (algo === 'bcrypt')
-  {
-    options = assign({}, options, globalOptions.bcrypt);
+  if (algo === 'bcrypt') {
+    options = assign({}, options, globalOptions.bcrypt)
 
-    return (info.options.cost < options.cost);
+    return (info.options.cost < options.cost)
   }
 
-  return false;
+  return false
 }
-exports.needsRehash = needsRehash;
+exports.needsRehash = needsRehash
 
 /**
  * Checks whether the password and the hash match.
@@ -171,14 +164,13 @@ exports.needsRehash = needsRehash;
  *
  * @return {object} A promise which will receive a boolean.
  */
-function verify(password, hash) {
-  var info = getInfo(hash);
+function verify (password, hash) {
+  var info = getInfo(hash)
 
-  if (info.algo === 'bcrypt')
-  {
-    return bcrypt.compareAsync(password, hash);
+  if (info.algo === 'bcrypt') {
+    return bcrypt.compareAsync(password, hash)
   }
 
-  throw new Error('unsupported algorithm');
+  throw new Error('unsupported algorithm')
 }
-exports.verify = makeAsyncWrapper(verify);
+exports.verify = makeAsyncWrapper(verify)

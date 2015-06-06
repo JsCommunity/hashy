@@ -1,29 +1,26 @@
 #!/usr/bin/env node
 
-'use strict';
+'use strict'
 
-//====================================================================
-
-var yargs = require('yargs');
+var yargs = require('yargs')
 // TESTABILITY: makes yargs throws instead of exiting.
 yargs.fail(function (msg) {
-  var help = yargs.help();
+  var help = yargs.help()
 
-  if (msg)
-  {
-    help += '\n' + msg;
+  if (msg) {
+    help += '\n' + msg
   }
 
-  throw help;
-});
+  throw help
+})
 
-//--------------------------------------------------------------------
+// --------------------------------------------------------------------
 
-var hashy = require('./');
+var hashy = require('./')
 
-//====================================================================
+// ====================================================================
 
-function main(argv) {
+function main (argv) {
   var options = yargs
     .usage('Usage: hashy [<option>...]')
     .example('hashy <secret>', 'hash the secret')
@@ -32,53 +29,47 @@ function main(argv) {
       h: {
         alias: 'help',
         boolean: true,
-        describe: 'display this help message',
+        describe: 'display this help message'
       },
       v: {
         alias: 'version',
         boolean: true,
-        describe: 'display the version number',
-      },
+        describe: 'display the version number'
+      }
     })
     .parse(argv)
-  ;
 
-  if (options.help)
-  {
-    return yargs.help();
+  if (options.help) {
+    return yargs.help()
   }
 
-  if (options.version)
-  {
-    var pkg = require('./package');
-    return 'Hashy version '+ pkg.version;
+  if (options.version) {
+    var pkg = require('./package')
+    return 'Hashy version ' + pkg.version
   }
 
-  var args = options._;
+  var args = options._
 
-  if (args.length === 1)
-  {
-    return hashy.hash(args[0]).then(console.log);
+  if (args.length === 1) {
+    return hashy.hash(args[0]).then(console.log)
   }
 
-  if (args.length === 2)
-  {
+  if (args.length === 2) {
     return hashy.verify(args[0], args[1]).then(function (success) {
-      if (success)
-      {
-        return 'ok';
+      if (success) {
+        return 'ok'
       }
 
-      throw 'not ok';
-    });
+      throw new Error('not ok')
+    })
   }
 
-  throw 'incorrect number of arguments';
+  throw new Error('incorrect number of arguments')
 }
-exports = module.exports = main;
+exports = module.exports = main
 
-//====================================================================
+// ====================================================================
 
 if (!module.parent) {
-  require('exec-promise')(main);
+  require('exec-promise')(main)
 }
