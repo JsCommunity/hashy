@@ -9,7 +9,49 @@
 // ===================================================================
 
 var Bluebird = require('bluebird')
-var bcrypt = Bluebird.promisifyAll(require('bcrypt'))
+
+var bcrypt
+try {
+  bcrypt = (function (bcrypt) {
+    var promisify = Bluebird.promisify
+
+    return {
+      compare: promisify(bcrypt.compareAsync),
+      getRounds: bcrypt.getRounds,
+      hash: promisify(bcrypt.hashAsync)
+    }
+  })(require('bcrypt'))
+} catch (_) {
+  bcrypt = (function (bcryptjs) {
+    var push = [].push
+
+    function promisify (fn, ctx) {
+      return function promisified () {
+        var args = []
+        push.apply(args, arguments)
+
+        return new Bluebird(function (resolve) {
+          args.push(resolve)
+          fn.apply(ctx, args)
+        })
+      }
+    }
+
+    var HASH_RE = /^\$2a\$(\d+)\$/
+
+    return {
+      compare: promisify(bcryptjs.compare),
+      getRounds: function (hash) {
+        var matches = HASH_RE.exec(hash)
+        if (!matches) {
+          throw new Error('invalid match')
+        }
+        return +matches[1]
+      },
+      hash: promisify(bcryptjs.hash)
+    }
+  })(require('twin-bcrypt'))
+}
 
 // ===================================================================
 
@@ -91,7 +133,7 @@ function hash (password, algo, options) {
 
   if (algo === 'bcrypt') {
     options = assign({}, options, globalOptions.bcrypt)
-    return bcrypt.hashAsync(password, options.cost)
+    return bcrypt.hash(password, options.cost)
   }
 
   throw new Error('unsupported algorithm')
@@ -168,7 +210,7 @@ function verify (password, hash) {
   var info = getInfo(hash)
 
   if (info.algo === 'bcrypt') {
-    return bcrypt.compareAsync(password, hash)
+    return bcrypt.compare(password, hash)
   }
 
   throw new Error('unsupported algorithm')
