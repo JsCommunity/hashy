@@ -225,7 +225,7 @@ function needsRehash (hash, algo, options) {
   if (algo === 'bcrypt') {
     return (
       info.id !== '2y' ||
-      info.options.cost < (options.cost || globalOptions.bcrypt.cost)
+      info.options.cost < (options && options.cost || globalOptions.bcrypt.cost)
     )
   }
 
