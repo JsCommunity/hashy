@@ -15,8 +15,7 @@ the node.js philosophy, hashing is done asynchronously.
 Furthermore, to make the interfaces as easy to use as possible, async
 functions can either be used with callbacks or they return
 [promises](https://en.wikipedia.org/wiki/Promise_%28programming%29)
-which will make them super easy to work with [generators](https://gith
-ub.com/petkaantonov/bluebird/blob/master/API.md#generators)!
+which will make them super easy to work with [generators](https://github.com/petkaantonov/bluebird/blob/master/API.md#generators)!
 
 ## Why a new library?
 
