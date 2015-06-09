@@ -24,18 +24,32 @@ var data = [
       options: {
         cost: 10
       }
-    }
+    },
+    needsRehash: true
   },
   {
     value: 'password',
-    hash: '$2y$08$YRwXzG/oaZyp6jhsRgUs8eEIyi16nNwi3TtRAJDkQk0YTST.LC/6O',
+    hash: '$2y$08$NVRpJ.42Kt3FM0SWq/.a1uk7U8stm6Ce7EMgooPjBpDZHMiugFVhu',
     info: {
       algo: 'bcrypt',
       id: '2y',
       options: {
         cost: 8
       }
-    }
+    },
+    needsRehash: true
+  },
+  {
+    value: 'password',
+    hash: '$2y$11$ddGrBWDagPYovj6dsoUy6OHkeh0wNfQWWhONtPdj7q8qbPX.LtvRW',
+    info: {
+      algo: 'bcrypt',
+      id: '2y',
+      options: {
+        cost: 11
+      }
+    },
+    needsRehash: false
   }
 ]
 
@@ -73,5 +87,23 @@ describe('getInfo()', function () {
 })
 
 describe('needsRehash()', function () {
-  it('returns true if the algorithm or the options differs')
+  var needsRehash = hashy.needsRehash
+
+  it('returns true if the algorithm or the options differs', function () {
+    data.forEach(function (datum) {
+      expect(needsRehash(datum.hash)).to.equal(datum.needsRehash)
+    })
+  })
+})
+
+describe('verify()', function () {
+  var verify = hashy.verify
+
+  it('returns whether the password matches the hash', function () {
+    return Bluebird.map(data, function (datum) {
+      return verify(datum.value, datum.hash).then(function (success) {
+        expect(success).to.be.true
+      })
+    })
+  })
 })

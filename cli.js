@@ -55,8 +55,15 @@ function main (argv) {
   }
 
   if (args.length === 2) {
-    return hashy.verify(args[0], args[1]).then(function (success) {
+    var password = args[0]
+    var hash = args[1]
+
+    return hashy.verify(password, hash).then(function (success) {
       if (success) {
+        if (hashy.needsRehash(hash)) {
+          return 'ok but password should be rehashed'
+        }
+
         return 'ok'
       }
 
