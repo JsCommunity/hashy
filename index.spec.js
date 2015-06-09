@@ -20,8 +20,20 @@ var data = [
     hash: '$2a$10$3F2S0bh8CO8aVzW/tqyjI.iVQnLNea1YIpNSpS8dmJwUVNXP3D4/y',
     info: {
       algo: 'bcrypt',
+      id: '2a',
       options: {
         cost: 10
+      }
+    }
+  },
+  {
+    value: 'password',
+    hash: '$2y$08$YRwXzG/oaZyp6jhsRgUs8eEIyi16nNwi3TtRAJDkQk0YTST.LC/6O',
+    info: {
+      algo: 'bcrypt',
+      id: '2y',
+      options: {
+        cost: 8
       }
     }
   }

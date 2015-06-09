@@ -37,14 +37,14 @@ try {
       }
     }
 
-    var HASH_RE = /^\$2a\$(\d+)\$/
+    var HASH_RE = /^\$[^$]+\$(\d+)\$/
 
     return {
       compare: promisify(bcryptjs.compare),
       getRounds: function (hash) {
         var matches = HASH_RE.exec(hash)
         if (!matches) {
-          throw new Error('invalid match')
+          throw new Error('invalid hash: ' + hash)
         }
         return +matches[1]
       },
@@ -74,34 +74,65 @@ function assign (target, source) {
 
 // -------------------------------------------------------------------
 
-var isFunction = (function () {
-  var toString = Object.prototype.toString
-
-  var tag = toString.call(function () {})
+var isFunction = (function (toString) {
+  var tag = toString.call(toString)
 
   return function isFunction (value) {
     return (toString.call(value) === tag)
   }
-})()
+})(Object.prototype.toString)
 
 // -------------------------------------------------------------------
 
-var slice = Array.prototype.slice
-
 // Similar to Bluebird.method(fn) but handle Node callbacks.
-function makeAsyncWrapper (fn) {
-  return function asyncWrapper () {
-    var args = slice.call(arguments)
-    var callback
+var makeAsyncWrapper = (function (slice) {
+  return function makeAsyncWrapper (fn) {
+    return function asyncWrapper () {
+      var args = slice.call(arguments)
+      var callback
 
-    var n = args.length
-    if (n && isFunction(args[--n])) {
-      callback = args.pop()
+      var n = args.length
+      if (n && isFunction(args[--n])) {
+        callback = args.pop()
+      }
+
+      return Bluebird.try(fn, args, this).nodeify(callback)
+    }
+  }
+})(Array.prototype.slice)
+
+// ===================================================================
+
+var IDENTS_TO_ALGOS = (function (idsByAlgo) {
+  var algo, ids, i, n
+
+  var algosById = Object.create(null)
+
+  for (algo in idsByAlgo) {
+    if (has.call(idsByAlgo, algo)) {
+      ids = idsByAlgo[algo]
+
+      for (i = 0, n = ids.length; i < n; ++i) {
+        algosById[ids[i]] = algo
+      }
+    }
+  }
+
+  return algosById
+})({
+  bcrypt: ['2', '2a', '2x', '2y']
+})
+
+var getAlgoId = (function (HASH_RE) {
+  return function getAlgoId (hash) {
+    var matches = HASH_RE.exec(hash)
+    if (!matches) {
+      throw new Error('invalid hash: ' + hash)
     }
 
-    return Bluebird.try(fn, args, this).nodeify(callback)
+    return matches[1]
   }
-}
+})(/^\$([^$]+)\$/)
 
 // ===================================================================
 
@@ -149,10 +180,13 @@ exports.hash = makeAsyncWrapper(hash)
  *     hash: “algo”: the algorithm used, “options” the options used.
  */
 function getInfo (hash) {
-  // What to do with “$2x$” and “$2y$”?
-  if (hash.substring(0, 4) === '$2a$') {
+  var algoId = getAlgoId(hash)
+  var algo = IDENTS_TO_ALGOS[algoId]
+
+  if (algo === 'bcrypt') {
     return {
       algo: 'bcrypt',
+      id: algoId,
       options: {
         cost: bcrypt.getRounds(hash)
       }
@@ -161,6 +195,7 @@ function getInfo (hash) {
 
   return {
     algo: 'unknown',
+    id: 'unknown',
     options: {}
   }
 }
@@ -188,9 +223,10 @@ function needsRehash (hash, algo, options) {
   }
 
   if (algo === 'bcrypt') {
-    options = assign({}, options, globalOptions.bcrypt)
-
-    return (info.options.cost < options.cost)
+    return (
+      info.id !== '2y' ||
+      info.options.cost < (options.cost || globalOptions.bcrypt.cost)
+    )
   }
 
   return false
