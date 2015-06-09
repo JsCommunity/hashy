@@ -17,36 +17,24 @@ Bluebird.longStackTraces()
 var data = [
   {
     value: 'password',
-    hash: '$2a$10$3F2S0bh8CO8aVzW/tqyjI.iVQnLNea1YIpNSpS8dmJwUVNXP3D4/y',
+    hash: '$2y$04$bCdlo4cUGt5.DpaorjzbN.XUX46/YNj4iKsdTvSQ3UE0pleNR2rjS',
     info: {
       algo: 'bcrypt',
-      id: '2a',
+      id: '2y',
       options: {
-        cost: 10
+        cost: 4
       }
     },
     needsRehash: true
   },
   {
     value: 'password',
-    hash: '$2y$08$NVRpJ.42Kt3FM0SWq/.a1uk7U8stm6Ce7EMgooPjBpDZHMiugFVhu',
+    hash: '$2y$05$P2ZY1eZ3oex3LZJ9bGuRnugsVeq6AXy2wlasiKmYamgDEl6w2dRMG',
     info: {
       algo: 'bcrypt',
       id: '2y',
       options: {
-        cost: 8
-      }
-    },
-    needsRehash: true
-  },
-  {
-    value: 'password',
-    hash: '$2y$11$ddGrBWDagPYovj6dsoUy6OHkeh0wNfQWWhONtPdj7q8qbPX.LtvRW',
-    info: {
-      algo: 'bcrypt',
-      id: '2y',
-      options: {
-        cost: 11
+        cost: 5
       }
     },
     needsRehash: false
@@ -54,6 +42,9 @@ var data = [
 ]
 
 // ===================================================================
+
+// Sets a small cost for Bcrypt to speed up the tests.
+hashy.options.bcrypt.cost = 5
 
 describe('hash()', function () {
   var hash = hashy.hash
