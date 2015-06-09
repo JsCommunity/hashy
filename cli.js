@@ -35,6 +35,10 @@ function main (argv) {
         alias: 'version',
         boolean: true,
         describe: 'display the version number'
+      },
+      c: {
+        alias: 'cost',
+        describe: 'cost for Bcrypt'
       }
     })
     .parse(argv)
@@ -46,6 +50,10 @@ function main (argv) {
   if (options.version) {
     var pkg = require('./package')
     return 'Hashy version ' + pkg.version
+  }
+
+  if (options.cost) {
+    hashy.options.bcrypt.cost = +options.cost
   }
 
   var args = options._
