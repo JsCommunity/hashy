@@ -6,14 +6,14 @@
 
 'use strict'
 
-// ////////////////////////////////////////////////////////////////////
+// ===================================================================
 
 // To make it work directly from the git repository we are using this
 // require but from your project you should just have to do:
 //     var hashy = require('hashy')
 var hashy = require('..')
 
-// ////////////////////////////////////////////////////////////////////
+// ===================================================================
 
 // This value will probably be retrieved from a database.
 var hash = '$2a$08$3VbKizuJA1RdlRafd48Kfuf/eKE9kPhP8tOoyHFDmmr/rFkV.d/mO'
