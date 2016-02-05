@@ -11,48 +11,7 @@
 var promiseToolbox = require('promise-toolbox')
 
 var asCallback = promiseToolbox.asCallback
-var promisify = promiseToolbox.promisify
-
-var bcrypt
-try {
-  bcrypt = (function (bcrypt) {
-    return {
-      compare: promisify(bcrypt.compareAsync),
-      getRounds: bcrypt.getRounds,
-      hash: promisify(bcrypt.hashAsync)
-    }
-  })(require('bcrypt'))
-} catch (_) {
-  bcrypt = (function (bcryptjs) {
-    var push = [].push
-
-    function promisify (fn, ctx) {
-      return function promisified () {
-        var args = []
-        push.apply(args, arguments)
-
-        return new Promise(function (resolve) {
-          args.push(resolve)
-          fn.apply(ctx, args)
-        })
-      }
-    }
-
-    var HASH_RE = /^\$[^$]+\$(\d+)\$/
-
-    return {
-      compare: promisify(bcryptjs.compare),
-      getRounds: function (hash) {
-        var matches = HASH_RE.exec(hash)
-        if (!matches) {
-          throw new Error('invalid hash: ' + hash)
-        }
-        return +matches[1]
-      },
-      hash: promisify(bcryptjs.hash)
-    }
-  })(require('twin-bcrypt'))
-}
+var promisifyAll = promiseToolbox.promisifyAll
 
 // ===================================================================
 
@@ -73,7 +32,11 @@ function assign (target, source) {
   return target
 }
 
-// -------------------------------------------------------------------
+function forArray (array, iteratee) {
+  for (var i = 0, n = array.length; i < n; ++i) {
+    iteratee(array[i], i, array)
+  }
+}
 
 var isFunction = (function (toString) {
   var tag = toString.call(toString)
@@ -82,8 +45,6 @@ var isFunction = (function (toString) {
     return (toString.call(value) === tag)
   }
 })(Object.prototype.toString)
-
-// -------------------------------------------------------------------
 
 // Similar to Bluebird.method(fn) but handle Node callbacks.
 var makeAsyncWrapper = (function (push) {
@@ -107,51 +68,156 @@ var makeAsyncWrapper = (function (push) {
 
 // ===================================================================
 
-var IDENTS_TO_ALGOS = (function (idsByAlgo) {
-  var algo, ids, i, n
+var algorithmsById = Object.create(null)
+var algorithmsByName = Object.create(null)
 
-  var algosById = Object.create(null)
-
-  for (algo in idsByAlgo) {
-    if (has.call(idsByAlgo, algo)) {
-      ids = idsByAlgo[algo]
-
-      for (i = 0, n = ids.length; i < n; ++i) {
-        algosById[ids[i]] = algo
-      }
-    }
-  }
-
-  return algosById
-})({
-  bcrypt: ['2', '2a', '2x', '2y']
-})
-
-var getAlgoId = (function (HASH_RE) {
-  return function getAlgoId (hash) {
-    var matches = HASH_RE.exec(hash)
-    if (!matches) {
-      throw new Error('invalid hash: ' + hash)
-    }
-
-    return matches[1]
-  }
-})(/^\$([^$]+)\$/)
-
-// ===================================================================
-
-var globalOptions = {}
+var globalOptions = Object.create(null)
 exports.options = globalOptions
 
-// -------------------------------------------------------------------
+var DEFAULT_ALGO
 
-var DEFAULT_ALGO = 'bcrypt'
+function registerAlgorithm (algo) {
+  var name = algo.name
 
-globalOptions.bcrypt = {
-  cost: 10
+  if (algorithmsByName[name]) {
+    throw new Error('name ' + name + ' already taken')
+  }
+  algorithmsByName[name] = algo
+
+  forArray(algo.ids, function (id) {
+    if (algorithmsById[id]) {
+      throw new Error('id ' + id + ' already taken')
+    }
+    algorithmsById[id] = algo
+  })
+
+  globalOptions[name] = assign(Object.create(null), algo.defaults)
+
+  if (!DEFAULT_ALGO) {
+    DEFAULT_ALGO = name
+  }
 }
 
 // -------------------------------------------------------------------
+
+try {
+  ;(function (argon2) {
+    var FALSE_FN = function () { return false }
+    var TRUE_FN = function () { return true }
+
+    var log2 = Math.log2 || (function (log, log2) {
+      return function (value) {
+        return log(value) / log2
+      }
+    })(Math.log, Math.log(2))
+
+    registerAlgorithm({
+      name: 'argon2',
+      ids: [ 'argon2d', 'argon2i' ],
+      defaults: require('argon2').defaults,
+
+      getOptions: function (_, info) {
+        var options = {}
+        info.options.split(',').forEach(function (datum) {
+          var index = datum.indexOf('=')
+          if (index === -1) {
+            options[datum] = true
+          } else {
+            options[datum.slice(0, index)] = datum.slice(index + 1)
+          }
+        })
+        return {
+          memoryCost: log2(+options.m),
+          parallelism: +options.p,
+          timeCost: +options.t
+        }
+      },
+      hash: function (password, options) {
+        return argon2.generateSaltAsync().then(function (salt) {
+          return argon2.hashAsync(password, salt, options)
+        })
+      },
+      verify: function (password, hash) {
+        return argon2.verifyAsync(hash, password).then(TRUE_FN, FALSE_FN)
+      }
+    })
+  })(promisifyAll.call(require('argon2')))
+} catch (_) {}
+
+;(function (bcrypt) {
+  registerAlgorithm({
+    name: 'bcrypt',
+    ids: [ '2', '2a', '2x', '2y' ],
+    defaults: { cost: 10 },
+
+    getOptions: function (_, info) {
+      return {
+        cost: +info.options
+      }
+    },
+    hash: function (password, options) {
+      return bcrypt.genSaltAsync(options.cost).then(function (salt) {
+        return bcrypt.hashAsync(password, salt)
+      })
+    },
+    needsRehash: function (_, info) {
+      if (info.id !== '2y') {
+        return true
+      }
+
+      // Otherwise, let the default algorithm decides.
+    },
+    verify: function (password, hash) {
+      return bcrypt.compareAsync(password, hash)
+    }
+  })
+})(promisifyAll.call(function () {
+  try {
+    return require('bcrypt')
+  } catch (_) {
+    return require('bcryptjs')
+  }
+}()))
+
+// -------------------------------------------------------------------
+
+var getHashInfo = (function (HASH_RE) {
+  return function getHashInfo (hash) {
+    var matches = hash.match(HASH_RE)
+    if (!matches) {
+      throw new Error('invalid hash ' + hash)
+    }
+
+    return {
+      id: matches[1],
+      options: matches[2]
+    }
+  }
+})(/^\$([^$]+)\$([^$]*)\$/)
+
+function getAlgorithmByName (name) {
+  var algo = algorithmsByName[name]
+  if (!algo) {
+    throw new Error('no available algorithm with name ' + name)
+  }
+
+  return algo
+}
+
+function getAlgorithmFromId (id) {
+  var algo = algorithmsById[id]
+  if (!algo) {
+    throw new Error('no available algorithm with id ' + id)
+  }
+
+  return algo
+}
+
+function getAlgorithmFromHash (hash) {
+  return getAlgorithmFromId(getHashInfo(hash).id)
+}
+
+// ===================================================================
 
 /**
  * Hashes a password.
@@ -164,14 +230,12 @@ globalOptions.bcrypt = {
  * @return {object} A promise which will receive the hashed password.
  */
 function hash (password, algo, options) {
-  algo || (algo = DEFAULT_ALGO)
+  algo = getAlgorithmByName(algo || DEFAULT_ALGO)
 
-  if (algo === 'bcrypt') {
-    options = assign({}, options, globalOptions.bcrypt)
-    return bcrypt.hash(password, options.cost)
-  }
-
-  throw new Error('unsupported algorithm')
+  return algo.hash(
+    password,
+    assign(Object.create(null), globalOptions[algo.name], options)
+  )
 }
 exports.hash = makeAsyncWrapper(hash)
 
@@ -181,27 +245,16 @@ exports.hash = makeAsyncWrapper(hash)
  * @param {string} hash The hash you want to get information from.
  *
  * @return {object} Object containing information about the given
- *     hash: “algo”: the algorithm used, “options” the options used.
+ *     hash: “algorithm”: the algorithm used, “options” the options
+ *     used.
  */
 function getInfo (hash) {
-  var algoId = getAlgoId(hash)
-  var algo = IDENTS_TO_ALGOS[algoId]
+  var info = getHashInfo(hash)
+  var algo = getAlgorithmFromId(info.id)
+  info.algorithm = algo.name
+  info.options = algo.getOptions(hash, info)
 
-  if (algo === 'bcrypt') {
-    return {
-      algo: 'bcrypt',
-      id: algoId,
-      options: {
-        cost: bcrypt.getRounds(hash)
-      }
-    }
-  }
-
-  return {
-    algo: 'unknown',
-    id: 'unknown',
-    options: {}
-  }
+  return info
 }
 exports.getInfo = getInfo
 
@@ -220,17 +273,27 @@ exports.getInfo = getInfo
 function needsRehash (hash, algo, options) {
   var info = getInfo(hash)
 
-  algo || (algo = DEFAULT_ALGO)
-
-  if (info.algo !== algo) {
+  if (info.algorithm !== (algo || DEFAULT_ALGO)) {
     return true
   }
 
-  if (algo === 'bcrypt') {
-    return (
-      info.id !== '2y' ||
-      info.options.cost < (options && options.cost || globalOptions.bcrypt.cost)
-    )
+  var algoNeedsRehash = getAlgorithmFromId(info.id).needsRehash
+  var result = algoNeedsRehash && algoNeedsRehash(hash, info)
+  if (typeof result === 'boolean') {
+    return result
+  }
+
+  var expected = assign(Object.create(null), globalOptions[info.algorithm], options)
+  var actual = info.options
+
+  for (var prop in expected) {
+    var value = expected[prop]
+    if (
+      typeof value === 'number' &&
+      !(value <= actual[prop])
+    ) {
+      return true
+    }
   }
 
   return false
@@ -247,12 +310,6 @@ exports.needsRehash = needsRehash
  * @return {object} A promise which will receive a boolean.
  */
 function verify (password, hash) {
-  var info = getInfo(hash)
-
-  if (info.algo === 'bcrypt') {
-    return bcrypt.compare(password, hash)
-  }
-
-  throw new Error('unsupported algorithm')
+  return getAlgorithmFromHash(hash).verify(password, hash)
 }
 exports.verify = makeAsyncWrapper(verify)

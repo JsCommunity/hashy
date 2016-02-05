@@ -25,12 +25,13 @@
     "url": "https://github.com/julien-f/nodejs-hashy"
   },
   "dependencies": {
+    "bcryptjs": "^2.3.0",
     "exec-promise": "^0.5.0",
     "promise-toolbox": "^0.1.0",
-    "twin-bcrypt": "^2.1.1",
     "yargs": "^3.10.0"
   },
   "optionalDependencies": {
+    "argon2": "^0.8.0",
     "bcrypt": "~0.8.0"
   },
   "devDependencies": {

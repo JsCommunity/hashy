@@ -16,7 +16,7 @@ var data = [
     value: 'password',
     hash: '$2y$04$bCdlo4cUGt5.DpaorjzbN.XUX46/YNj4iKsdTvSQ3UE0pleNR2rjS',
     info: {
-      algo: 'bcrypt',
+      algorithm: 'bcrypt',
       id: '2y',
       options: {
         cost: 4
@@ -28,10 +28,24 @@ var data = [
     value: 'password',
     hash: '$2y$05$P2ZY1eZ3oex3LZJ9bGuRnugsVeq6AXy2wlasiKmYamgDEl6w2dRMG',
     info: {
-      algo: 'bcrypt',
+      algorithm: 'bcrypt',
       id: '2y',
       options: {
         cost: 5
+      }
+    },
+    needsRehash: false
+  },
+  {
+    value: 'password',
+    hash: '$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc',
+    info: {
+      algorithm: 'argon2',
+      id: 'argon2i',
+      options: {
+        memoryCost: 12,
+        parallelism: 1,
+        timeCost: 3
       }
     },
     needsRehash: false
@@ -79,7 +93,7 @@ describe('needsRehash()', function () {
 
   it('returns true if the algorithm or the options differs', function () {
     data.forEach(function (datum) {
-      expect(needsRehash(datum.hash)).to.equal(datum.needsRehash)
+      expect(needsRehash(datum.hash, datum.info.algorithm)).to.equal(datum.needsRehash)
     })
   })
 })
