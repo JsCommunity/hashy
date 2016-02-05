@@ -8,13 +8,14 @@
 
 // ===================================================================
 
-var Bluebird = require('bluebird')
+var promiseToolbox = require('promise-toolbox')
+
+var asCallback = promiseToolbox.asCallback
+var promisify = promiseToolbox.promisify
 
 var bcrypt
 try {
   bcrypt = (function (bcrypt) {
-    var promisify = Bluebird.promisify
-
     return {
       compare: promisify(bcrypt.compareAsync),
       getRounds: bcrypt.getRounds,
@@ -30,7 +31,7 @@ try {
         var args = []
         push.apply(args, arguments)
 
-        return new Bluebird(function (resolve) {
+        return new Promise(function (resolve) {
           args.push(resolve)
           fn.apply(ctx, args)
         })
@@ -85,21 +86,24 @@ var isFunction = (function (toString) {
 // -------------------------------------------------------------------
 
 // Similar to Bluebird.method(fn) but handle Node callbacks.
-var makeAsyncWrapper = (function (slice) {
+var makeAsyncWrapper = (function (push) {
   return function makeAsyncWrapper (fn) {
     return function asyncWrapper () {
-      var args = slice.call(arguments)
+      var args = []
+      push.apply(args, arguments)
       var callback
 
       var n = args.length
-      if (n && isFunction(args[--n])) {
+      if (n && isFunction(args[n - 1])) {
         callback = args.pop()
       }
 
-      return Bluebird.try(fn, args, this).nodeify(callback)
+      return asCallback.call(new Promise(function (resolve) {
+        resolve(fn.apply(this, args))
+      }), callback)
     }
   }
-})(Array.prototype.slice)
+})(Array.prototype.push)
 
 // ===================================================================
 

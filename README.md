@@ -32,6 +32,18 @@ This is exactly what this function is for: checking whether a hash
 uses the correct algorithm (and options) to see if we need to compute
 a new hash for this password.
 
+## Install
+
+Installation of the npm package:
+
+```
+> npm install --save hashy
+```
+
+Hashy requires promises support, for Node versions prior to 0.12 [see
+this page](https://github.com/julien-f/js-promise-toolbox#usage) to
+enable them.
+
 ## How to use it?
 
 First, you may take a look at examples: using [callbacks](https://github.com/julien-f/nodejs-hashy/blob/master/examples/callbacks.js), [promises](https://github.com/julien-f/nodejs-hashy/blob/master/examples/promises.js) or [generators](https://github.com/julien-f/nodejs-hashy/blob/master/examples/generators.js) (requires Node >= 0.11).
