@@ -4,13 +4,10 @@
 
 // ===================================================================
 
-var hashy = require('./')
-
-// -------------------------------------------------------------------
-
+require('native-promise-only')
 var expect = require('chai').expect
-var Bluebird = require('bluebird')
-Bluebird.longStackTraces()
+
+var hashy = require('./')
 
 // ===================================================================
 
@@ -58,11 +55,11 @@ describe('hash()', function () {
   })
 
   it('does not creates the same hash twice', function () {
-    return Bluebird.all([
+    return Promise.all([
       hash('test'),
       hash('test')
-    ]).spread(function (hash1, hash2) {
-      expect(hash1).to.not.equal(hash2)
+    ]).then(function (hashes) {
+      expect(hashes[0]).to.not.equal(hashes[1])
     })
   })
 })
@@ -91,10 +88,10 @@ describe('verify()', function () {
   var verify = hashy.verify
 
   it('returns whether the password matches the hash', function () {
-    return Bluebird.map(data, function (datum) {
+    return Promise.all(data.map(function (datum) {
       return verify(datum.value, datum.hash).then(function (success) {
         expect(success).to.be.true
       })
-    })
+    }))
   })
 })
