@@ -104,50 +104,6 @@ function registerAlgorithm (algo) {
 
 // -------------------------------------------------------------------
 
-try {
-  ;(function (argon2) {
-    var FALSE_FN = function () { return false }
-    var TRUE_FN = function () { return true }
-
-    var log2 = Math.log2 || (function (log, log2) {
-      return function (value) {
-        return log(value) / log2
-      }
-    })(Math.log, Math.log(2))
-
-    registerAlgorithm({
-      name: 'argon2',
-      ids: [ 'argon2d', 'argon2i' ],
-      defaults: require('argon2').defaults,
-
-      getOptions: function (_, info) {
-        var options = {}
-        info.options.split(',').forEach(function (datum) {
-          var index = datum.indexOf('=')
-          if (index === -1) {
-            options[datum] = true
-          } else {
-            options[datum.slice(0, index)] = datum.slice(index + 1)
-          }
-        })
-        return {
-          memoryCost: log2(+options.m),
-          parallelism: +options.p,
-          timeCost: +options.t
-        }
-      },
-      hash: function (password, options) {
-        return argon2.generateSaltAsync().then(function (salt) {
-          return argon2.hashAsync(password, salt, options)
-        })
-      },
-      verify: function (password, hash) {
-        return argon2.verifyAsync(hash, password).then(TRUE_FN, FALSE_FN)
-      }
-    })
-  })(promisifyAll.call(require('argon2')))
-} catch (_) {}
-
 ;(function (bcrypt) {
   registerAlgorithm({
     name: 'bcrypt',
@@ -191,6 +147,50 @@ try {
     return require('bcryptjs')
   }
 }()))
+
+try {
+  ;(function (argon2) {
+    var FALSE_FN = function () { return false }
+    var TRUE_FN = function () { return true }
+
+    var log2 = Math.log2 || (function (log, log2) {
+      return function (value) {
+        return log(value) / log2
+      }
+    })(Math.log, Math.log(2))
+
+    registerAlgorithm({
+      name: 'argon2',
+      ids: [ 'argon2d', 'argon2i' ],
+      defaults: require('argon2').defaults,
+
+      getOptions: function (_, info) {
+        var options = {}
+        info.options.split(',').forEach(function (datum) {
+          var index = datum.indexOf('=')
+          if (index === -1) {
+            options[datum] = true
+          } else {
+            options[datum.slice(0, index)] = datum.slice(index + 1)
+          }
+        })
+        return {
+          memoryCost: log2(+options.m),
+          parallelism: +options.p,
+          timeCost: +options.t
+        }
+      },
+      hash: function (password, options) {
+        return argon2.generateSaltAsync().then(function (salt) {
+          return argon2.hashAsync(password, salt, options)
+        })
+      },
+      verify: function (password, hash) {
+        return argon2.verifyAsync(hash, password).then(TRUE_FN, FALSE_FN)
+      }
+    })
+  })(promisifyAll.call(require('argon2')))
+} catch (_) {}
 
 // -------------------------------------------------------------------
 
