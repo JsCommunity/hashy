@@ -5,6 +5,7 @@ node_js:
   - '0.12'
   - '0.10'
 
-# Use containers.
-# http://docs.travis-ci.com/user/workers/container-based-infrastructure/
-sudo: false
+# Use Trusty (more recent version of gcc).
+# https://docs.travis-ci.com/user/trusty-ci-environment
+sudo: required
+dist: trusty
