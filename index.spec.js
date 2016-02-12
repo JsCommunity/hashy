@@ -5,7 +5,9 @@
 // ===================================================================
 
 require('native-promise-only')
+
 var expect = require('chai').expect
+var semver = require('semver')
 
 var hashy = require('./')
 
@@ -35,8 +37,11 @@ var data = [
       }
     },
     needsRehash: false
-  },
-  {
+  }
+]
+
+if (semver.satisfies(process.version, '>=4')) {
+  data.push({
     value: 'password',
     hash: '$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc',
     info: {
@@ -49,8 +54,8 @@ var data = [
       }
     },
     needsRehash: false
-  }
-]
+  })
+}
 
 // ===================================================================
 
