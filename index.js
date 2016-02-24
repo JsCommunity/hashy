@@ -181,15 +181,15 @@ try {
         }
       },
       hash: function (password, options) {
-        return argon2.generateSaltAsync().then(function (salt) {
-          return argon2.hashAsync(password, salt, options)
+        return argon2.generateSalt().then(function (salt) {
+          return argon2.hash(password, salt, options)
         })
       },
       verify: function (password, hash) {
-        return argon2.verifyAsync(hash, password).then(TRUE_FN, FALSE_FN)
+        return argon2.verify(hash, password).then(TRUE_FN, FALSE_FN)
       }
     })
-  })(promisifyAll.call(require('argon2')))
+  })(require('argon2'))
 } catch (_) {}
 
 // -------------------------------------------------------------------
