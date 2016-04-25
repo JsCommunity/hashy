@@ -116,8 +116,8 @@ function registerAlgorithm (algo) {
       }
     },
     hash: function (password, options) {
-      return bcrypt.genSaltAsync(options.cost).then(function (salt) {
-        return bcrypt.hashAsync(password, salt)
+      return bcrypt.genSalt(options.cost).then(function (salt) {
+        return bcrypt.hash(password, salt)
       })
     },
     needsRehash: function (_, info) {
@@ -137,7 +137,7 @@ function registerAlgorithm (algo) {
         hash = '$2a$' + hash.slice(4)
       }
 
-      return bcrypt.compareAsync(password, hash)
+      return bcrypt.compare(password, hash)
     }
   })
 })(promisifyAll.call(function () {
