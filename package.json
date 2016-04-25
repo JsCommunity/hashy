@@ -25,19 +25,21 @@
     "url": "https://github.com/julien-f/nodejs-hashy"
   },
   "dependencies": {
-    "exec-promise": "^0.5.0",
+    "bcryptjs": "^2.3.0",
+    "exec-promise": "^0.6.1",
     "promise-toolbox": "^0.1.0",
-    "twin-bcrypt": "^2.1.1",
     "yargs": "^3.10.0"
   },
   "optionalDependencies": {
+    "argon2": "^0.11.1",
     "bcrypt": "~0.8.0"
   },
   "devDependencies": {
     "chai": "^3.0.0",
     "mocha": "^2.2.5",
     "native-promise-only": "^0.8.1",
-    "standard": "^5.1.1"
+    "semver": "^5.1.0",
+    "standard": "^6.0.4"
   },
   "scripts": {
     "lint": "standard",

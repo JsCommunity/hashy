@@ -17,6 +17,11 @@ functions can either be used with callbacks or they return
 [promises](https://en.wikipedia.org/wiki/Promise_%28programming%29)
 which will make them super easy to work with [generators](https://github.com/petkaantonov/bluebird/blob/master/API.md#generators)!
 
+Supported algorithms:
+
+- [Argon2](https://en.wikipedia.org/wiki/Argon2)
+- [bcrypt](https://en.wikipedia.org/wiki/Bcrypt)
+
 ## Why a new library?
 
 The other ones I found were too complicated and/or were missing
