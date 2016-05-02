@@ -39,7 +39,7 @@
     "mocha": "^2.2.5",
     "native-promise-only": "^0.8.1",
     "semver": "^5.1.0",
-    "standard": "^6.0.4"
+    "standard": "^7.0.0"
   },
   "scripts": {
     "lint": "standard",
