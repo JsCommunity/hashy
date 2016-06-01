@@ -164,9 +164,20 @@ try {
       ids: [ 'argon2d', 'argon2i' ],
       defaults: require('argon2').defaults,
 
-      getOptions: function (_, info) {
+      getOptions: function (hash, info) {
+        var rawOptions = info.options
         var options = {}
-        info.options.split(',').forEach(function (datum) {
+
+        // Since Argon2 1.3, the version number is encoded in the hash.
+        var version
+        if (rawOptions.slice(0, 2) === 'v=') {
+          version = +rawOptions.slice(2)
+
+          var index = hash.indexOf(rawOptions) + rawOptions.length + 1
+          rawOptions = hash.slice(index, hash.indexOf('$', index))
+        }
+
+        rawOptions.split(',').forEach(function (datum) {
           var index = datum.indexOf('=')
           if (index === -1) {
             options[datum] = true
@@ -174,11 +185,16 @@ try {
             options[datum.slice(0, index)] = datum.slice(index + 1)
           }
         })
-        return {
+
+        options = {
           memoryCost: log2(+options.m),
           parallelism: +options.p,
           timeCost: +options.t
         }
+        if (version != null) {
+          options.version = version
+        }
+        return options
       },
       hash: function (password, options) {
         return argon2.generateSalt().then(function (salt) {

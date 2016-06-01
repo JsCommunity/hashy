@@ -54,6 +54,20 @@ if (semver.satisfies(process.version, '>=4')) {
       }
     },
     needsRehash: false
+  }, {
+    value: 'password',
+    hash: '$argon2i$v=19$m=4096,t=3,p=1$BHBji9GuMvFc7SrpWucvcQ$7ITF2KM6dkpqGQQKvdMQrfdZ/uhOuiV0A/ZwjCuManM',
+    info: {
+      algorithm: 'argon2',
+      id: 'argon2i',
+      options: {
+        memoryCost: 12,
+        parallelism: 1,
+        timeCost: 3,
+        version: 19
+      }
+    },
+    needsRehash: false
   })
 }
 
