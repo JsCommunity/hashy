@@ -23,9 +23,13 @@ var hashy = require('./')
 function main (argv) {
   var options = yargs
     .usage('Usage: hashy [<option>...]')
-    .example('hashy <secret>', 'hash the secret')
+    .example('hashy [ -a <algorithm> <secret>', 'hash the secret')
     .example('hashy <secret> <hash>', 'verify the secret using the hash')
     .options({
+      a: {
+        default: hashy.DEFAULT_ALGO,
+        describe: 'algorithm to use for hashing'
+      },
       h: {
         alias: 'help',
         boolean: true,
@@ -59,7 +63,7 @@ function main (argv) {
   var args = options._
 
   if (args.length === 1) {
-    return hashy.hash(args[0]).then(console.log)
+    return hashy.hash(args[0], options.a).then(console.log)
   }
 
   if (args.length === 2) {
@@ -68,7 +72,7 @@ function main (argv) {
 
     return hashy.verify(password, hash).then(function (success) {
       if (success) {
-        if (hashy.needsRehash(hash)) {
+        if (hashy.needsRehash(hash, options.a)) {
           return 'ok but password should be rehashed'
         }
 

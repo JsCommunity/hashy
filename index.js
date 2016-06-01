@@ -79,6 +79,12 @@ var globalOptions = Object.create(null)
 exports.options = globalOptions
 
 var DEFAULT_ALGO
+Object.defineProperty(exports, 'DEFAULT_ALGO', {
+  enumerable: true,
+  get: function () {
+    return DEFAULT_ALGO
+  }
+})
 
 function registerAlgorithm (algo) {
   var name = algo.name
