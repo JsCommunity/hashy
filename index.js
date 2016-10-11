@@ -146,7 +146,7 @@ function registerAlgorithm (algo) {
       return bcrypt.compare(password, hash)
     }
   })
-})(promisifyAll.call(function () {
+})(promisifyAll(function () {
   try {
     return require('bcrypt')
   } catch (_) {
