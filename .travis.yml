@@ -1,7 +1,8 @@
 language: node_js
 node_js:
   - stable
-  - '4'
+  - 6
+  - 4
 
 # Use Trusty (more recent version of gcc).
 # https://docs.travis-ci.com/user/trusty-ci-environment
