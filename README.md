@@ -1,8 +1,8 @@
 # Hashy
 
-[![Build Status](https://img.shields.io/travis/julien-f/nodejs-hashy/master.svg)](http://travis-ci.org/julien-f/nodejs-hashy)
-[![Dependency Status](https://david-dm.org/julien-f/nodejs-hashy/status.svg?theme=shields.io)](https://david-dm.org/julien-f/nodejs-hashy)
-[![devDependency Status](https://david-dm.org/julien-f/nodejs-hashy/dev-status.svg?theme=shields.io)](https://david-dm.org/julien-f/nodejs-hashy#info=devDependencies)
+[![Build Status](https://img.shields.io/travis/JsCommunity/hashy/master.svg)](http://travis-ci.org/JsCommunity/hashy)
+[![Dependency Status](https://david-dm.org/JsCommunity/hashy/status.svg?theme=shields.io)](https://david-dm.org/JsCommunity/hashy)
+[![devDependency Status](https://david-dm.org/JsCommunity/hashy/dev-status.svg?theme=shields.io)](https://david-dm.org/JsCommunity/hashy#info=devDependencies)
 
 Hashy is small [node.js](http://nodejs.org/) library which aims to do
 passwords hashing *[the correct
@@ -46,12 +46,12 @@ Installation of the npm package:
 ```
 
 Hashy requires promises support, for Node versions prior to 0.12 [see
-this page](https://github.com/julien-f/js-promise-toolbox#usage) to
+this page](https://github.com/JsCommunity/promise-toolbox#usage) to
 enable them.
 
 ## How to use it?
 
-First, you may take a look at examples: using [callbacks](https://github.com/julien-f/nodejs-hashy/blob/master/examples/callbacks.js), [promises](https://github.com/julien-f/nodejs-hashy/blob/master/examples/promises.js) or [generators](https://github.com/julien-f/nodejs-hashy/blob/master/examples/generators.js) (requires Node >= 0.11).
+First, you may take a look at examples: using [callbacks](https://github.com/JsCommunity/hashy/blob/master/examples/callbacks.js), [promises](https://github.com/JsCommunity/hashy/blob/master/examples/promises.js) or [generators](https://github.com/JsCommunity/hashy/blob/master/examples/generators.js) (requires Node >= 0.11).
 
 ### Creating a hash
 
@@ -173,7 +173,7 @@ the code.
 
 You may:
 
-- report any [issue](https://github.com/julien-f/nodejs-hashy/issues)
+- report any [issue](https://github.com/JsCommunity/hashy/issues)
   you've encountered;
 - fork and create a pull request.
 

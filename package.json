@@ -7,8 +7,8 @@
     "password",
     "hash"
   ],
-  "homepage": "https://github.com/julien-f/nodejs-hashy",
-  "bugs": "https://github.com/julien-f/nodejs-hashy/issues",
+  "homepage": "https://github.com/JsCommunity/hashy",
+  "bugs": "https://github.com/JsCommunity/hashy/issues",
   "author": {
     "name": "Julien Fontanet",
     "email": "julien.fontanet@isonoe.net",
@@ -22,7 +22,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/julien-f/nodejs-hashy"
+    "url": "https://github.com/JsCommunity/hashy"
   },
   "dependencies": {
     "bcryptjs": "^2.3.0",
