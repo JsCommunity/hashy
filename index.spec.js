@@ -1,12 +1,11 @@
 'use strict'
 
-/* eslint-env mocha */
+/* eslint-env jest */
 
 // ===================================================================
 
 require('native-promise-only')
 
-var expect = require('chai').expect
 var semver = require('semver')
 
 var hashy = require('./')
@@ -92,7 +91,7 @@ describe('hash()', function () {
       hash('test'),
       hash('test')
     ]).then(function (hashes) {
-      expect(hashes[0]).to.not.equal(hashes[1])
+      expect(hashes[0]).not.toBe(hashes[1])
     })
   })
 })
@@ -102,7 +101,7 @@ describe('getInfo()', function () {
 
   it('returns the algorithm and options', function () {
     data.forEach(function (datum) {
-      expect(getInfo(datum.hash)).to.deep.equal(datum.info)
+      expect(getInfo(datum.hash)).toEqual(datum.info)
     })
   })
 })
@@ -112,7 +111,7 @@ describe('needsRehash()', function () {
 
   it('returns true if the algorithm or the options differs', function () {
     data.forEach(function (datum) {
-      expect(needsRehash(datum.hash, datum.info.algorithm)).to.equal(datum.needsRehash)
+      expect(needsRehash(datum.hash, datum.info.algorithm)).toBe(datum.needsRehash)
     })
   })
 })
@@ -123,7 +122,7 @@ describe('verify()', function () {
   it('returns whether the password matches the hash', function () {
     return Promise.all(data.map(function (datum) {
       return verify(datum.value, datum.hash).then(function (success) {
-        expect(success).to.be.true
+        expect(success).toBe(true)
       })
     }))
   })

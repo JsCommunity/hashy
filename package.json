@@ -35,16 +35,14 @@
     "bcrypt": "^1.0.1"
   },
   "devDependencies": {
-    "chai": "^3.0.0",
-    "mocha": "^3.0.0",
+    "jest": "^17.0.3",
     "native-promise-only": "^0.8.1",
     "semver": "^5.1.0",
     "standard": "^8.0.0"
   },
   "scripts": {
-    "lint": "standard",
-    "test": "mocha index.spec.js",
-    "posttest": "npm run lint"
+    "test": "jest",
+    "posttest": "standard"
   },
   "files": [
     "index.js",
