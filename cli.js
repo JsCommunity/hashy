@@ -23,7 +23,7 @@ var hashy = require('./')
 function main (argv) {
   var options = yargs
     .usage('Usage: hashy [<option>...]')
-    .example('hashy [ -a <algorithm> <secret>', 'hash the secret')
+    .example('hashy [ -a <algorithm> ] <secret>', 'hash the secret')
     .example('hashy <secret> <hash>', 'verify the secret using the hash')
     .options({
       a: {
