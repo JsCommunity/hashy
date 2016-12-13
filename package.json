@@ -32,7 +32,7 @@
   },
   "optionalDependencies": {
     "argon2": "^0.14.1",
-    "bcrypt": "~0.8.0"
+    "bcrypt": "^1.0.1"
   },
   "devDependencies": {
     "chai": "^3.0.0",
