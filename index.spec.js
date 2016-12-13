@@ -6,8 +6,6 @@
 
 require('native-promise-only')
 
-var semver = require('semver')
-
 var hashy = require('./')
 
 // ===================================================================
@@ -39,7 +37,7 @@ var data = [
   }
 ]
 
-if (semver.satisfies(process.version, '>=4')) {
+if (hashy.options.argon2) {
   data.push({
     value: 'password',
     hash: '$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc',
@@ -68,6 +66,8 @@ if (semver.satisfies(process.version, '>=4')) {
     },
     needsRehash: false
   })
+} else {
+  console.warn('argon2 is not tested')
 }
 
 // ===================================================================

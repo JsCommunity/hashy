@@ -37,7 +37,6 @@
   "devDependencies": {
     "jest": "^17.0.3",
     "native-promise-only": "^0.8.1",
-    "semver": "^5.1.0",
     "standard": "^8.0.0"
   },
   "scripts": {
