@@ -2,10 +2,13 @@
   "name": "hashy",
   "version": "0.5.1",
   "license": "MIT",
-  "description": "Create, check and update password hashes.",
+  "description": "Hash passwords the right way (Argon2 & bcrypt support)",
   "keywords": [
-    "password",
-    "hash"
+    "argon2",
+    "bcrypt",
+    "hash",
+    "hashing",
+    "password"
   ],
   "homepage": "https://github.com/JsCommunity/hashy",
   "bugs": "https://github.com/JsCommunity/hashy/issues",

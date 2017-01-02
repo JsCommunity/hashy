@@ -4,6 +4,8 @@
 [![Dependency Status](https://david-dm.org/JsCommunity/hashy/status.svg?theme=shields.io)](https://david-dm.org/JsCommunity/hashy)
 [![devDependency Status](https://david-dm.org/JsCommunity/hashy/dev-status.svg?theme=shields.io)](https://david-dm.org/JsCommunity/hashy#info=devDependencies)
 
+> Hash passwords the right way (Argon2 & bcrypt support)
+
 Hashy is small [node.js](http://nodejs.org/) library which aims to do
 passwords hashing *[the correct
 way](https://wiki.php.net/rfc/password_hash)*.
