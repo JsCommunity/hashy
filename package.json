@@ -28,19 +28,19 @@
     "url": "https://github.com/JsCommunity/hashy"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.0",
+    "bcryptjs": "^2.4.3",
     "exec-promise": "^0.6.1",
-    "promise-toolbox": "^0.7.0",
+    "promise-toolbox": "^0.8.0",
     "yargs": "^6.6.0"
   },
   "optionalDependencies": {
-    "argon2": "^0.14.1",
+    "argon2": "^0.15.0",
     "bcrypt": "^1.0.2"
   },
   "devDependencies": {
-    "jest": "^18.1.0",
+    "jest": "^19.0.2",
     "native-promise-only": "^0.8.1",
-    "standard": "^8.6.0"
+    "standard": "^9.0.0"
   },
   "scripts": {
     "test": "jest",
