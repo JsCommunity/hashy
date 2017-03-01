@@ -43,8 +43,9 @@
     "standard": "^9.0.0"
   },
   "scripts": {
-    "test": "jest",
-    "posttest": "standard"
+    "dev-test": "jest --watch",
+    "posttest": "standard",
+    "test": "jest"
   },
   "files": [
     "index.js",

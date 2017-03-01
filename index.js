@@ -321,11 +321,11 @@ function needsRehash (hash, algo, options) {
   var expected = assign(Object.create(null), globalOptions[info.algorithm], options)
   var actual = info.options
 
-  for (var prop in expected) {
-    var value = expected[prop]
+  for (var prop in actual) {
+    var value = actual[prop]
     if (
       typeof value === 'number' &&
-      !(value <= actual[prop])
+      value < expected[prop]
     ) {
       return true
     }
