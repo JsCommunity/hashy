@@ -34,7 +34,7 @@
     "yargs": "^6.6.0"
   },
   "optionalDependencies": {
-    "argon2": "^0.15.0",
+    "argon2": "^0.16.1",
     "bcrypt": "^1.0.2"
   },
   "devDependencies": {

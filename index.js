@@ -156,9 +156,6 @@ function registerAlgorithm (algo) {
 
 try {
   ;(function (argon2) {
-    var FALSE_FN = function () { return false }
-    var TRUE_FN = function () { return true }
-
     var log2 = Math.log2 || (function (log, log2) {
       return function (value) {
         return log(value) / log2
@@ -202,13 +199,9 @@ try {
         }
         return options
       },
-      hash: function (password, options) {
-        return argon2.generateSalt().then(function (salt) {
-          return argon2.hash(password, salt, options)
-        })
-      },
+      hash: argon2.hash,
       verify: function (password, hash) {
-        return argon2.verify(hash, password).then(TRUE_FN, FALSE_FN)
+        return argon2.verify(hash, password)
       }
     })
   })(require('argon2'))
