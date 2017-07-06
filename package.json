@@ -38,10 +38,10 @@
     "bcrypt": "^1.0.2"
   },
   "devDependencies": {
-    "husky": "^0.13.1",
-    "jest": "^19.0.2",
+    "husky": "^0.14.3",
+    "jest": "^20.0.4",
     "native-promise-only": "^0.8.1",
-    "standard": "^9.0.0"
+    "standard": "^10.0.2"
   },
   "scripts": {
     "commitmsg": "yarn test",
