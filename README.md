@@ -6,18 +6,18 @@
 
 > Hash passwords the right way (Argon2 & bcrypt support)
 
-Hashy is small [node.js](http://nodejs.org/) library which aims to do
+Hashy is small [Node.js](http://nodejs.org/) library which aims to do
 passwords hashing *[the correct
 way](https://wiki.php.net/rfc/password_hash)*.
 
 It has been heavily inspired by the new [PHP password hashing
 API](http://www.php.net/manual/en/book.password.php) but, following
-the node.js philosophy, hashing is done asynchronously.
+the Node.js philosophy, hashing is done asynchronously.
 
 Furthermore, to make the interfaces as easy to use as possible, async
 functions can either be used with callbacks or they return
 [promises](https://en.wikipedia.org/wiki/Promise_%28programming%29)
-which will make them super easy to work with [generators](https://github.com/petkaantonov/bluebird/blob/master/API.md#generators)!
+which will make them super easy to work with [async functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)!
 
 Supported algorithms:
 
@@ -53,7 +53,7 @@ enable them.
 
 ## How to use it?
 
-First, you may take a look at examples: using [callbacks](https://github.com/JsCommunity/hashy/blob/master/examples/callbacks.js), [promises](https://github.com/JsCommunity/hashy/blob/master/examples/promises.js) or [generators](https://github.com/JsCommunity/hashy/blob/master/examples/generators.js) (requires Node >= 0.11).
+First, you may take a look at examples: using [callbacks](https://github.com/JsCommunity/hashy/blob/master/examples/callbacks.js), [promises](https://github.com/JsCommunity/hashy/blob/master/examples/promises.js) or [async functions](https://github.com/JsCommunity/hashy/blob/master/examples/async.js) (requires Node >= 7.6).
 
 ### Creating a hash
 
@@ -144,23 +144,23 @@ hashy.verify(password, hash).then(function (success) {
 As you can see, you don't even have to handle errors if you don't want
 to!
 
-## Using generators
+## Using async functions
 
-**Note:** only available since node.js 0.12.
+**Note:** only available since Node.js 7.6.
 
 Same interface as promises but much more similar to a synchronous
 code!
 
 ```javascript
 // Hashing.
-Bluebird.coroutine(function * () {
-  var hash = yield hashy.hash(password)
+(async function () {
+  var hash = await hashy.hash(password)
   console.log('generated hash:', hash)
 })()
 
 // Checking.
-Bluebird.coroutine(function * () {
-  if (yield hashy.verify(password, hash)) {
+(async function () {
+  if (await hashy.verify(password, hash)) {
     console.log('you are now authenticated!')
   } else {
     console.warn('invalid password!')
