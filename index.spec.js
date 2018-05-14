@@ -45,7 +45,7 @@ if (hashy.options.argon2) {
       algorithm: 'argon2',
       id: 'argon2i',
       options: {
-        memoryCost: 12,
+        memoryCost: 4096,
         parallelism: 1,
         timeCost: 3
       }
@@ -58,7 +58,7 @@ if (hashy.options.argon2) {
       algorithm: 'argon2',
       id: 'argon2i',
       options: {
-        memoryCost: 12,
+        memoryCost: 4096,
         parallelism: 1,
         timeCost: 3,
         version: 19

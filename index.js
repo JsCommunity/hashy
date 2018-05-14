@@ -156,12 +156,6 @@ function registerAlgorithm (algo) {
 
 try {
   ;(function (argon2) {
-    var log2 = Math.log2 || (function (log, log2) {
-      return function (value) {
-        return log(value) / log2
-      }
-    })(Math.log, Math.log(2))
-
     registerAlgorithm({
       name: 'argon2',
       ids: [ 'argon2d', 'argon2i' ],
@@ -190,11 +184,11 @@ try {
         })
 
         options = {
-          memoryCost: log2(+options.m),
+          memoryCost: +options.m,
           parallelism: +options.p,
           timeCost: +options.t
         }
-        if (version != null) {
+        if (version !== undefined) {
           options.version = version
         }
         return options
