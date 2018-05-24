@@ -113,7 +113,7 @@ function registerAlgorithm (algo) {
 ;(function (bcrypt) {
   registerAlgorithm({
     name: 'bcrypt',
-    ids: [ '2', '2a', '2x', '2y' ],
+    ids: [ '2', '2a', '2b', '2x', '2y' ],
     defaults: { cost: 10 },
 
     getOptions: function (_, info) {
@@ -130,6 +130,7 @@ function registerAlgorithm (algo) {
       var id = info.id
       if (
         id !== '2a' &&
+        id !== '2b' &&
         id !== '2y'
       ) {
         return true
