@@ -7,8 +7,8 @@
 > Hash passwords the right way (Argon2 & bcrypt support)
 
 Hashy is small [Node.js](http://nodejs.org/) library which aims to do
-passwords hashing *[the correct
-way](https://wiki.php.net/rfc/password_hash)*.
+passwords hashing _[the correct
+way](https://wiki.php.net/rfc/password_hash)_.
 
 It has been heavily inspired by the new [PHP password hashing
 API](http://www.php.net/manual/en/book.password.php) but, following
@@ -58,42 +58,41 @@ First, you may take a look at examples: using [callbacks](https://github.com/JsC
 ### Creating a hash
 
 ```js
-hashy.hash(password, function (error, hash) {
+hashy.hash(password, function(error, hash) {
   if (error) {
-    return console.log(error)
+    return console.log(error);
   }
 
-  console.log('generated hash: ', hash)
-})
+  console.log("generated hash: ", hash);
+});
 ```
 
 `hash()` handles additionaly two parameters which may be passed before the callback:
 
 1. `algo`: which algorithm to use, it defaults to `'bcrypt'`;
 2. `options`: additional options for the current algorithm, for bcrypt
-it defaults to `{cost: 10}.`.
-
+   it defaults to `{cost: 10}.`.
 
 ### Checking a password against a hash
 
 ```js
-hashy.verify(password, hash, function (error, success) {
+hashy.verify(password, hash, function(error, success) {
   if (error) {
-    return console.error(err)
+    return console.error(err);
   }
 
   if (success) {
-    console.log('you are now authenticated!')
+    console.log("you are now authenticated!");
   } else {
-    console.warn('invalid password!')
+    console.warn("invalid password!");
   }
-})
+});
 ```
 
 ### Getting information about a hash
 
 ```js
-var info = hashy.getInfo(hash)
+const info = hashy.getInfo(hash);
 ```
 
 ### Checking whether a hash is up to date
@@ -117,7 +116,7 @@ The default options for a given algorithm is available at `hashy.options[&gt;alg
 
 ```js
 // Sets the default cost for bcrypt to 12.
-hashy.options.bcrypt.cost = 12
+hashy.options.bcrypt.cost = 12;
 ```
 
 ## Using promises
@@ -153,24 +152,24 @@ code!
 
 ```javascript
 // Hashing.
-(async function () {
-  var hash = await hashy.hash(password)
-  console.log('generated hash:', hash)
-})()
-
-// Checking.
-(async function () {
-  if (await hashy.verify(password, hash)) {
-    console.log('you are now authenticated!')
-  } else {
-    console.warn('invalid password!')
+(async function() {
+  const hash = await hashy.hash(password);
+  console.log("generated hash:", hash);
+})()(
+  // Checking.
+  async function() {
+    if (await hashy.verify(password, hash)) {
+      console.log("you are now authenticated!");
+    } else {
+      console.warn("invalid password!");
+    }
   }
-})()
+)();
 ```
 
 ## Contributing
 
-Contributions are *very* welcome, either on the documentation or on
+Contributions are _very_ welcome, either on the documentation or on
 the code.
 
 You may:

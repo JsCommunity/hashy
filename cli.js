@@ -1,94 +1,94 @@
 #!/usr/bin/env node
 
-'use strict'
+"use strict";
 
-var yargs = require('yargs')
+const yargs = require("yargs");
 // TESTABILITY: makes yargs throws instead of exiting.
-yargs.fail(function (msg) {
-  var help = yargs.help()
+yargs.fail(function(msg) {
+  let help = yargs.help();
 
   if (msg) {
-    help += '\n' + msg
+    help += "\n" + msg;
   }
 
-  throw help
-})
+  throw help;
+});
 
 // --------------------------------------------------------------------
 
-var hashy = require('./')
+const hashy = require("./");
 
 // ====================================================================
 
-function main (argv) {
-  var options = yargs
-    .usage('Usage: hashy [<option>...]')
-    .example('hashy [ -a <algorithm> ] <secret>', 'hash the secret')
-    .example('hashy <secret> <hash>', 'verify the secret using the hash')
+function main(argv) {
+  const options = yargs
+    .usage("Usage: hashy [<option>...]")
+    .example("hashy [ -a <algorithm> ] <secret>", "hash the secret")
+    .example("hashy <secret> <hash>", "verify the secret using the hash")
     .options({
       a: {
         default: hashy.DEFAULT_ALGO,
-        describe: 'algorithm to use for hashing'
+        describe: "algorithm to use for hashing",
       },
       h: {
-        alias: 'help',
+        alias: "help",
         boolean: true,
-        describe: 'display this help message'
+        describe: "display this help message",
       },
       v: {
-        alias: 'version',
+        alias: "version",
         boolean: true,
-        describe: 'display the version number'
+        describe: "display the version number",
       },
       c: {
-        alias: 'cost',
-        describe: 'cost for Bcrypt'
-      }
+        alias: "cost",
+        describe: "cost for Bcrypt",
+      },
     })
-    .parse(argv)
+    .parse(argv);
 
   if (options.help) {
-    return yargs.help()
+    return yargs.help();
   }
 
   if (options.version) {
-    var pkg = require('./package')
-    return 'Hashy version ' + pkg.version
+    const pkg = require("./package");
+    return "Hashy version " + pkg.version;
   }
 
   if (options.cost) {
-    hashy.options.bcrypt.cost = +options.cost
+    hashy.options.bcrypt.cost = +options.cost;
   }
 
-  var args = options._
+  const args = options._;
 
   if (args.length === 1) {
-    return hashy.hash(args[0], options.a).then(console.log)
+    return hashy.hash(args[0], options.a).then(console.log);
   }
 
   if (args.length === 2) {
-    var password = args[0]
-    var hash = args[1]
+    const password = args[0];
+    const hash = args[1];
 
-    return hashy.verify(password, hash).then(function (success) {
+    return hashy.verify(password, hash).then(function(success) {
       if (success) {
         if (hashy.needsRehash(hash, options.a)) {
-          return 'ok but password should be rehashed'
+          return "ok but password should be rehashed";
         }
 
-        return 'ok'
+        return "ok";
       }
 
-      throw new Error('not ok')
-    })
+      throw new Error("not ok");
+    });
   }
 
-  throw new Error('incorrect number of arguments')
+  throw new Error("incorrect number of arguments");
 }
-exports = module.exports = main
+exports = module.exports = main;
 
 // ====================================================================
 
 if (!module.parent) {
-  require('exec-promise')(main)
+  require("exec-promise")(main);
 }
