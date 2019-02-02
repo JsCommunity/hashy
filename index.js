@@ -147,13 +147,7 @@ function registerAlgorithm (algo) {
       return bcrypt.compare(password, hash)
     }
   })
-})(promisifyAll(function () {
-  try {
-    return require('bcrypt')
-  } catch (_) {
-    return require('bcryptjs')
-  }
-}()))
+})(promisifyAll(require('bcryptjs')))
 
 try {
   ;(function (argon2) {
