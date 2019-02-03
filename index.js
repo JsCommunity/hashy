@@ -15,37 +15,6 @@ const promisifyAll = promiseToolbox.promisifyAll;
 
 // ===================================================================
 
-const has = Object.prototype.hasOwnProperty;
-
-function assign(target, source) {
-  let i, n, key;
-
-  for (i = 1, n = arguments.length; i < n; ++i) {
-    source = arguments[i];
-    for (key in source) {
-      if (has.call(source, key)) {
-        target[key] = source[key];
-      }
-    }
-  }
-
-  return target;
-}
-
-function forArray(array, iteratee) {
-  for (let i = 0, n = array.length; i < n; ++i) {
-    iteratee(array[i], i, array);
-  }
-}
-
-const isFunction = (function(toString) {
-  const tag = toString.call(toString);
-
-  return function isFunction(value) {
-    return toString.call(value) === tag;
-  };
-})(Object.prototype.toString);
-
 // Similar to Bluebird.method(fn) but handle Node callbacks.
 const makeAsyncWrapper = (function(push) {
   return function makeAsyncWrapper(fn) {
@@ -55,7 +24,7 @@ const makeAsyncWrapper = (function(push) {
       let callback;
 
       const n = args.length;
-      if (n && isFunction(args[n - 1])) {
+      if (n && typeof args[n - 1] === "function") {
         callback = args.pop();
       }
 
@@ -68,10 +37,6 @@ const makeAsyncWrapper = (function(push) {
     };
   };
 })(Array.prototype.push);
-
-function startsWith(string, search) {
-  return string.lastIndexOf(search, 0) === 0;
-}
 
 // ===================================================================
 
@@ -97,14 +62,14 @@ function registerAlgorithm(algo) {
   }
   algorithmsByName[name] = algo;
 
-  forArray(algo.ids, function(id) {
+  algo.ids.forEach(function(id) {
     if (algorithmsById[id]) {
       throw new Error("id " + id + " already taken");
     }
     algorithmsById[id] = algo;
   });
 
-  globalOptions[name] = assign(Object.create(null), algo.defaults);
+  globalOptions[name] = Object.assign(Object.create(null), algo.defaults);
 
   if (!DEFAULT_ALGO) {
     DEFAULT_ALGO = name;
@@ -139,7 +104,7 @@ function registerAlgorithm(algo) {
     },
     verify: function(password, hash) {
       // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
-      if (startsWith(hash, "$2y$")) {
+      if (hash.startsWith("$2y$")) {
         hash = "$2a$" + hash.slice(4);
       }
 
@@ -250,7 +215,7 @@ function hash(password, algo, options) {
 
   return algo.hash(
     password,
-    assign(Object.create(null), globalOptions[algo.name], options)
+    Object.assign(Object.create(null), globalOptions[algo.name], options)
   );
 }
 exports.hash = makeAsyncWrapper(hash);
@@ -299,7 +264,7 @@ function needsRehash(hash, algo, options) {
     return result;
   }
 
-  const expected = assign(
+  const expected = Object.assign(
     Object.create(null),
     globalOptions[info.algorithm],
     options
