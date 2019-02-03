@@ -78,41 +78,6 @@ function registerAlgorithm(algo) {
 
 // -------------------------------------------------------------------
 
-(function(bcrypt) {
-  registerAlgorithm({
-    name: "bcrypt",
-    ids: ["2", "2a", "2b", "2x", "2y"],
-    defaults: { cost: 10 },
-
-    getOptions: function(_, info) {
-      return {
-        cost: +info.options,
-      };
-    },
-    hash: function(password, options) {
-      return bcrypt.genSalt(options.cost).then(function(salt) {
-        return bcrypt.hash(password, salt);
-      });
-    },
-    needsRehash: function(_, info) {
-      const id = info.id;
-      if (id !== "2a" && id !== "2b" && id !== "2y") {
-        return true;
-      }
-
-      // Otherwise, let the default algorithm decides.
-    },
-    verify: function(password, hash) {
-      // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
-      if (hash.startsWith("$2y$")) {
-        hash = "$2a$" + hash.slice(4);
-      }
-
-      return bcrypt.compare(password, hash);
-    },
-  });
-})(promisifyAll(require("bcryptjs")));
-
 try {
   (function(argon2) {
     registerAlgorithm({
@@ -159,6 +124,41 @@ try {
     });
   })(require("argon2"));
 } catch (_) {}
+
+(function(bcrypt) {
+  registerAlgorithm({
+    name: "bcrypt",
+    ids: ["2", "2a", "2b", "2x", "2y"],
+    defaults: { cost: 10 },
+
+    getOptions: function(_, info) {
+      return {
+        cost: +info.options,
+      };
+    },
+    hash: function(password, options) {
+      return bcrypt.genSalt(options.cost).then(function(salt) {
+        return bcrypt.hash(password, salt);
+      });
+    },
+    needsRehash: function(_, info) {
+      const id = info.id;
+      if (id !== "2a" && id !== "2b" && id !== "2y") {
+        return true;
+      }
+
+      // Otherwise, let the default algorithm decides.
+    },
+    verify: function(password, hash) {
+      // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
+      if (hash.startsWith("$2y$")) {
+        hash = "$2a$" + hash.slice(4);
+      }
+
+      return bcrypt.compare(password, hash);
+    },
+  });
+})(promisifyAll(require("bcryptjs")));
 
 // -------------------------------------------------------------------
 
