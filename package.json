@@ -17,6 +17,9 @@
     "email": "julien.fontanet@isonoe.net",
     "url": "http://julien.isonoe.net"
   },
+  "engines": {
+    "node": ">=6"
+  },
   "bin": {
     "hashy": "cli.js"
   },
