@@ -1,6 +1,8 @@
 # Hashy
 
-[![Package Version](https://badgen.net/npm/v/hashy)](https://npmjs.org/package/hashy) [![Build Status](https://travis-ci.org/JsCommunity/hashy.png?branch=master)](https://travis-ci.org/JsCommunity/hashy) [![PackagePhobia](https://badgen.net/packagephobia/install/hashy)](https://packagephobia.now.sh/result?p=hashy) [![Latest Commit](https://badgen.net/github/last-commit/JsCommunity/hashy)](https://github.com/JsCommunity/hashy/commits/master)
+[![Node compatibility](https://badgen.net/npm/node/hashy)](https://npmjs.org/package/hashy) [![PackagePhobia](https://badgen.net/packagephobia/install/hashy)](https://packagephobia.now.sh/result?p=hashy)
+
+[![Package Version](https://badgen.net/npm/v/hashy)](https://npmjs.org/package/hashy) [![Build Status](https://travis-ci.org/JsCommunity/hashy.png?branch=master)](https://travis-ci.org/JsCommunity/hashy) [![Latest Commit](https://badgen.net/github/last-commit/JsCommunity/hashy)](https://github.com/JsCommunity/hashy/commits/master)
 
 > Hash passwords the right way (Argon2 & bcrypt support)
 
