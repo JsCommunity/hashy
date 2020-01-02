@@ -18,7 +18,7 @@
     "url": "http://julien.isonoe.net"
   },
   "engines": {
-    "node": ">=6"
+    "node": ">=8.10"
   },
   "bin": {
     "hashy": "cli.js"
