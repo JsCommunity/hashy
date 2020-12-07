@@ -1,6 +1,6 @@
 {
   "name": "hashy",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "license": "MIT",
   "description": "Hash passwords the right way (Argon2 & bcrypt support)",
   "keywords": [
