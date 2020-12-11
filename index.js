@@ -78,52 +78,50 @@ function registerAlgorithm(algo) {
 
 // -------------------------------------------------------------------
 
-try {
-  (function(argon2) {
-    registerAlgorithm({
-      name: "argon2",
-      ids: ["argon2d", "argon2i"],
-      defaults: require("argon2").defaults,
+(function(argon2) {
+  registerAlgorithm({
+    name: "argon2",
+    ids: ["argon2d", "argon2i"],
+    defaults: require("argon2").defaults,
 
-      getOptions: function(hash, info) {
-        let rawOptions = info.options;
-        let options = {};
+    getOptions: function(hash, info) {
+      let rawOptions = info.options;
+      let options = {};
 
-        // Since Argon2 1.3, the version number is encoded in the hash.
-        let version;
-        if (rawOptions.slice(0, 2) === "v=") {
-          version = +rawOptions.slice(2);
+      // Since Argon2 1.3, the version number is encoded in the hash.
+      let version;
+      if (rawOptions.slice(0, 2) === "v=") {
+        version = +rawOptions.slice(2);
 
-          const index = hash.indexOf(rawOptions) + rawOptions.length + 1;
-          rawOptions = hash.slice(index, hash.indexOf("$", index));
+        const index = hash.indexOf(rawOptions) + rawOptions.length + 1;
+        rawOptions = hash.slice(index, hash.indexOf("$", index));
+      }
+
+      rawOptions.split(",").forEach(function(datum) {
+        const index = datum.indexOf("=");
+        if (index === -1) {
+          options[datum] = true;
+        } else {
+          options[datum.slice(0, index)] = datum.slice(index + 1);
         }
+      });
 
-        rawOptions.split(",").forEach(function(datum) {
-          const index = datum.indexOf("=");
-          if (index === -1) {
-            options[datum] = true;
-          } else {
-            options[datum.slice(0, index)] = datum.slice(index + 1);
-          }
-        });
-
-        options = {
-          memoryCost: +options.m,
-          parallelism: +options.p,
-          timeCost: +options.t,
-        };
-        if (version !== undefined) {
-          options.version = version;
-        }
-        return options;
-      },
-      hash: argon2.hash,
-      verify: function(password, hash) {
-        return argon2.verify(hash, password);
-      },
-    });
-  })(require("argon2"));
-} catch (_) {}
+      options = {
+        memoryCost: +options.m,
+        parallelism: +options.p,
+        timeCost: +options.t,
+      };
+      if (version !== undefined) {
+        options.version = version;
+      }
+      return options;
+    },
+    hash: argon2.hash,
+    verify: function(password, hash) {
+      return argon2.verify(hash, password);
+    },
+  });
+})(require("argon2"));
 
 (function(bcrypt) {
   registerAlgorithm({

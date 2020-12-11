@@ -31,13 +31,11 @@
     "url": "https://github.com/JsCommunity/hashy"
   },
   "dependencies": {
+    "argon2": "^0.27.0",
     "bcryptjs": "^2.4.3",
     "exec-promise": "^0.7.0",
     "promise-toolbox": "^0.15.0",
     "yargs": "^16.2.0"
-  },
-  "optionalDependencies": {
-    "argon2": "^0.27.0"
   },
   "devDependencies": {
     "eslint": "^6.5.1",

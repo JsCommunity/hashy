@@ -33,45 +33,38 @@ const data = {
     },
     needsRehash: false,
   },
+  argon2i: {
+    value: "password",
+    hash:
+      "$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc",
+    info: {
+      algorithm: "argon2",
+      id: "argon2i",
+      options: {
+        memoryCost: 4096,
+        parallelism: 1,
+        timeCost: 3,
+      },
+    },
+    needsRehash: false,
+  },
+  "argon2i with version": {
+    value: "password",
+    hash:
+      "$argon2i$v=19$m=4096,t=3,p=1$BHBji9GuMvFc7SrpWucvcQ$7ITF2KM6dkpqGQQKvdMQrfdZ/uhOuiV0A/ZwjCuManM",
+    info: {
+      algorithm: "argon2",
+      id: "argon2i",
+      options: {
+        memoryCost: 4096,
+        parallelism: 1,
+        timeCost: 3,
+        version: 19,
+      },
+    },
+    needsRehash: false,
+  },
 };
-
-if (hashy.options.argon2) {
-  Object.assign(data, {
-    argon2i: {
-      value: "password",
-      hash:
-        "$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc",
-      info: {
-        algorithm: "argon2",
-        id: "argon2i",
-        options: {
-          memoryCost: 4096,
-          parallelism: 1,
-          timeCost: 3,
-        },
-      },
-      needsRehash: false,
-    },
-    "argon2i with version": {
-      value: "password",
-      hash:
-        "$argon2i$v=19$m=4096,t=3,p=1$BHBji9GuMvFc7SrpWucvcQ$7ITF2KM6dkpqGQQKvdMQrfdZ/uhOuiV0A/ZwjCuManM",
-      info: {
-        algorithm: "argon2",
-        id: "argon2i",
-        options: {
-          memoryCost: 4096,
-          parallelism: 1,
-          timeCost: 3,
-          version: 19,
-        },
-      },
-      needsRehash: false,
-    },
-  });
-} else {
-  console.warn("argon2 is not tested");
-}
 
 const forOwn = (object, iteratee) => {
   Object.keys(object).forEach(key => {
