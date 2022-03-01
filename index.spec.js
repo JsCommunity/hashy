@@ -35,8 +35,7 @@ const data = {
   },
   argon2i: {
     value: "password",
-    hash:
-      "$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc",
+    hash: "$argon2i$m=4096,t=3,p=1$tbagT6b1YH33niCo9lVzuA$htv/k+OqWk1V9zD9k5DOBi2kcfcZ6Xu3tWmwEPV3/nc",
     info: {
       algorithm: "argon2",
       id: "argon2i",
@@ -50,8 +49,7 @@ const data = {
   },
   "argon2i with version": {
     value: "password",
-    hash:
-      "$argon2i$v=19$m=4096,t=3,p=1$BHBji9GuMvFc7SrpWucvcQ$7ITF2KM6dkpqGQQKvdMQrfdZ/uhOuiV0A/ZwjCuManM",
+    hash: "$argon2i$v=19$m=4096,t=3,p=1$BHBji9GuMvFc7SrpWucvcQ$7ITF2KM6dkpqGQQKvdMQrfdZ/uhOuiV0A/ZwjCuManM",
     info: {
       algorithm: "argon2",
       id: "argon2i",
@@ -67,7 +65,7 @@ const data = {
 };
 
 const forOwn = (object, iteratee) => {
-  Object.keys(object).forEach(key => {
+  Object.keys(object).forEach((key) => {
     iteratee(object[key], key, object);
   });
 };
@@ -77,42 +75,42 @@ const forOwn = (object, iteratee) => {
 // Sets a small cost for Bcrypt to speed up the tests.
 hashy.options.bcrypt.cost = 5;
 
-describe("hash()", function() {
+describe("hash()", function () {
   const hash = hashy.hash;
 
-  it("can return a promise", function() {
+  it("can return a promise", function () {
     return hash("test");
   });
 
-  it("can work with callback", function(done) {
+  it("can work with callback", function (done) {
     hash("test", done);
   });
 
-  it("does not creates the same hash twice", function() {
-    return Promise.all([hash("test"), hash("test")]).then(function(hashes) {
+  it("does not creates the same hash twice", function () {
+    return Promise.all([hash("test"), hash("test")]).then(function (hashes) {
       expect(hashes[0]).not.toBe(hashes[1]);
     });
   });
 });
 
-describe("getInfo()", function() {
+describe("getInfo()", function () {
   const getInfo = hashy.getInfo;
 
-  forOwn(data, function(datum, name) {
-    describe(name, function() {
-      it("returns the algorithm and options", function() {
+  forOwn(data, function (datum, name) {
+    describe(name, function () {
+      it("returns the algorithm and options", function () {
         expect(getInfo(datum.hash)).toEqual(datum.info);
       });
     });
   });
 });
 
-describe("needsRehash()", function() {
+describe("needsRehash()", function () {
   const needsRehash = hashy.needsRehash;
 
-  forOwn(data, function(datum, name) {
-    describe(name, function() {
-      it("returns true if the algorithm or the options differs", function() {
+  forOwn(data, function (datum, name) {
+    describe(name, function () {
+      it("returns true if the algorithm or the options differs", function () {
         expect(needsRehash(datum.hash, datum.info.algorithm)).toBe(
           datum.needsRehash
         );
@@ -121,13 +119,13 @@ describe("needsRehash()", function() {
   });
 });
 
-describe("verify()", function() {
+describe("verify()", function () {
   const verify = hashy.verify;
 
-  forOwn(data, function(datum, name) {
-    describe(name, function() {
-      it("returns whether the password matches the hash", function() {
-        return verify(datum.value, datum.hash).then(function(success) {
+  forOwn(data, function (datum, name) {
+    describe(name, function () {
+      it("returns whether the password matches the hash", function () {
+        return verify(datum.value, datum.hash).then(function (success) {
           expect(success).toBe(true);
         });
       });

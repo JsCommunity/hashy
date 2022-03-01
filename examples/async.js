@@ -21,7 +21,7 @@ let hash = "$2a$08$3VbKizuJA1RdlRafd48Kfuf/eKE9kPhP8tOoyHFDmmr/rFkV.d/mO";
 // This value will probably be sent by a client (e.g. web browser).
 const password = "test";
 
-(async function() {
+(async function () {
   if (!(await hashy.verify(password, hash))) {
     throw new Error("the password is invalid");
   }
@@ -35,7 +35,7 @@ const password = "test";
 
     console.log("the hash has been updated:", hash);
   }
-})().catch(error => {
+})().catch((error) => {
   // Display any error that might have happened in the chain.
   console.error(error);
 });

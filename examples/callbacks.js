@@ -22,7 +22,7 @@ let hash = "$2a$08$3VbKizuJA1RdlRafd48Kfuf/eKE9kPhP8tOoyHFDmmr/rFkV.d/mO";
 const password = "test";
 
 // First we will check whether or not they match.
-hashy.verify(password, hash, function(error, success) {
+hashy.verify(password, hash, function (error, success) {
   if (error) {
     console.error(error);
     return;
@@ -38,7 +38,7 @@ hashy.verify(password, hash, function(error, success) {
   // Now we can check if the hash should be recomputed, i.e. if it
   // fits the current security policies (algorithm & options).
   if (hashy.needsRehash(hash)) {
-    hashy.hash(password, function(error, newHash) {
+    hashy.hash(password, function (error, newHash) {
       if (error) {
         console.error(error);
         return;

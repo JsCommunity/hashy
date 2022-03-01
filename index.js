@@ -16,7 +16,7 @@ const promisifyAll = promiseToolbox.promisifyAll;
 // ===================================================================
 
 // Similar to Bluebird.method(fn) but handle Node callbacks.
-const makeAsyncWrapper = (function(push) {
+const makeAsyncWrapper = (function (push) {
   return function makeAsyncWrapper(fn) {
     return function asyncWrapper() {
       const args = [];
@@ -29,7 +29,7 @@ const makeAsyncWrapper = (function(push) {
       }
 
       return asCallback.call(
-        new Promise(function(resolve) {
+        new Promise(function (resolve) {
           resolve(fn.apply(this, args));
         }),
         callback
@@ -49,7 +49,7 @@ exports.options = globalOptions;
 let DEFAULT_ALGO;
 Object.defineProperty(exports, "DEFAULT_ALGO", {
   enumerable: true,
-  get: function() {
+  get: function () {
     return DEFAULT_ALGO;
   },
 });
@@ -62,7 +62,7 @@ function registerAlgorithm(algo) {
   }
   algorithmsByName[name] = algo;
 
-  algo.ids.forEach(function(id) {
+  algo.ids.forEach(function (id) {
     if (algorithmsById[id]) {
       throw new Error("id " + id + " already taken");
     }
@@ -78,13 +78,13 @@ function registerAlgorithm(algo) {
 
 // -------------------------------------------------------------------
 
-(function(argon2) {
+(function (argon2) {
   registerAlgorithm({
     name: "argon2",
     ids: ["argon2d", "argon2i"],
     defaults: require("argon2").defaults,
 
-    getOptions: function(hash, info) {
+    getOptions: function (hash, info) {
       let rawOptions = info.options;
       let options = {};
 
@@ -97,7 +97,7 @@ function registerAlgorithm(algo) {
         rawOptions = hash.slice(index, hash.indexOf("$", index));
       }
 
-      rawOptions.split(",").forEach(function(datum) {
+      rawOptions.split(",").forEach(function (datum) {
         const index = datum.indexOf("=");
         if (index === -1) {
           options[datum] = true;
@@ -117,29 +117,29 @@ function registerAlgorithm(algo) {
       return options;
     },
     hash: argon2.hash,
-    verify: function(password, hash) {
+    verify: function (password, hash) {
       return argon2.verify(hash, password);
     },
   });
 })(require("argon2"));
 
-(function(bcrypt) {
+(function (bcrypt) {
   registerAlgorithm({
     name: "bcrypt",
     ids: ["2", "2a", "2b", "2x", "2y"],
     defaults: { cost: 10 },
 
-    getOptions: function(_, info) {
+    getOptions: function (_, info) {
       return {
         cost: +info.options,
       };
     },
-    hash: function(password, options) {
-      return bcrypt.genSalt(options.cost).then(function(salt) {
+    hash: function (password, options) {
+      return bcrypt.genSalt(options.cost).then(function (salt) {
         return bcrypt.hash(password, salt);
       });
     },
-    needsRehash: function(_, info) {
+    needsRehash: function (_, info) {
       const id = info.id;
       if (id !== "2a" && id !== "2b" && id !== "2y") {
         return true;
@@ -147,7 +147,7 @@ function registerAlgorithm(algo) {
 
       // Otherwise, let the default algorithm decides.
     },
-    verify: function(password, hash) {
+    verify: function (password, hash) {
       // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
       if (hash.startsWith("$2y$")) {
         hash = "$2a$" + hash.slice(4);
@@ -160,7 +160,7 @@ function registerAlgorithm(algo) {
 
 // -------------------------------------------------------------------
 
-const getHashInfo = (function(HASH_RE) {
+const getHashInfo = (function (HASH_RE) {
   return function getHashInfo(hash) {
     const matches = hash.match(HASH_RE);
     if (!matches) {

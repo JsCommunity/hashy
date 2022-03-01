@@ -24,7 +24,7 @@ const password = "test";
 // First we will check whether or not they match.
 hashy
   .verify(password, hash)
-  .then(function(success) {
+  .then(function (success) {
     if (!success) {
       throw new Error("the password is invalid");
     }
@@ -34,14 +34,14 @@ hashy
     // Now we can check if the hash should be recomputed, i.e. if it
     // fits the current security policies (algorithm & options).
     if (hashy.needsRehash(hash)) {
-      return hashy.hash(password).then(function(newHash) {
+      return hashy.hash(password).then(function (newHash) {
         hash = newHash;
 
         console.log("the hash has been updated:", hash);
       });
     }
   })
-  .catch(function(error) {
+  .catch(function (error) {
     // Display any error that might have happened in the chain.
     console.error(error);
   });

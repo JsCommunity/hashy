@@ -58,7 +58,7 @@ First, you may take a look at examples: using [callbacks](https://github.com/JsC
 ### Creating a hash
 
 ```js
-hashy.hash(password, function(error, hash) {
+hashy.hash(password, function (error, hash) {
   if (error) {
     return console.log(error);
   }
@@ -76,7 +76,7 @@ hashy.hash(password, function(error, hash) {
 ### Checking a password against a hash
 
 ```js
-hashy.verify(password, hash, function(error, success) {
+hashy.verify(password, hash, function (error, success) {
   if (error) {
     return console.error(err);
   }
@@ -152,12 +152,12 @@ code!
 
 ```javascript
 // Hashing.
-(async function() {
+(async function () {
   const hash = await hashy.hash(password);
   console.log("generated hash:", hash);
 })()(
   // Checking.
-  async function() {
+  async function () {
     if (await hashy.verify(password, hash)) {
       console.log("you are now authenticated!");
     } else {

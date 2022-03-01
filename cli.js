@@ -4,7 +4,7 @@
 
 const yargs = require("yargs");
 // TESTABILITY: makes yargs throws instead of exiting.
-yargs.fail(function(msg) {
+yargs.fail(function (msg) {
   let help = yargs.help();
 
   if (msg) {
@@ -70,7 +70,7 @@ function main(argv) {
     const password = args[0];
     const hash = args[1];
 
-    return hashy.verify(password, hash).then(function(success) {
+    return hashy.verify(password, hash).then(function (success) {
       if (success) {
         if (hashy.needsRehash(hash, options.a)) {
           return "ok but password should be rehashed";
