@@ -1,8 +1,7 @@
 "use strict";
 
-/* eslint-env jest */
-
-// ===================================================================
+const { describe, it } = require("tap").mocha;
+const assert = require("assert");
 
 const hashy = require("./");
 
@@ -88,7 +87,7 @@ describe("hash()", function () {
 
   it("does not creates the same hash twice", function () {
     return Promise.all([hash("test"), hash("test")]).then(function (hashes) {
-      expect(hashes[0]).not.toBe(hashes[1]);
+      assert.notStrictEqual(hashes[0], hashes[1]);
     });
   });
 });
@@ -99,7 +98,7 @@ describe("getInfo()", function () {
   forOwn(data, function (datum, name) {
     describe(name, function () {
       it("returns the algorithm and options", function () {
-        expect(getInfo(datum.hash)).toEqual(datum.info);
+        assert.deepStrictEqual(getInfo(datum.hash), datum.info);
       });
     });
   });
@@ -111,7 +110,8 @@ describe("needsRehash()", function () {
   forOwn(data, function (datum, name) {
     describe(name, function () {
       it("returns true if the algorithm or the options differs", function () {
-        expect(needsRehash(datum.hash, datum.info.algorithm)).toBe(
+        assert.strictEqual(
+          needsRehash(datum.hash, datum.info.algorithm),
           datum.needsRehash
         );
       });
@@ -126,7 +126,7 @@ describe("verify()", function () {
     describe(name, function () {
       it("returns whether the password matches the hash", function () {
         return verify(datum.value, datum.hash).then(function (success) {
-          expect(success).toBe(true);
+          assert.strictEqual(success, true);
         });
       });
     });
