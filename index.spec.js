@@ -61,6 +61,21 @@ const data = {
     },
     needsRehash: false,
   },
+  argon2id: {
+    value: "password",
+    hash: "$argon2id$v=19$m=4096,t=3,p=1$y+oVGwJBgBWCU7nx3AJHFw$Athwv027c/e5qcddK4MZ30stAkkDfugD8VeB+3R2lJY",
+    info: {
+      algorithm: "argon2",
+      id: "argon2id",
+      options: {
+        memoryCost: 4096,
+        parallelism: 1,
+        timeCost: 3,
+        version: 19,
+      },
+    },
+    needsRehash: false,
+  },
 };
 
 const forOwn = (object, iteratee) => {

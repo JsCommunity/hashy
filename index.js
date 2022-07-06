@@ -81,7 +81,7 @@ function registerAlgorithm(algo) {
 (function (argon2) {
   registerAlgorithm({
     name: "argon2",
-    ids: ["argon2d", "argon2i"],
+    ids: ["argon2d", "argon2i", "argon2id"],
     defaults: require("argon2").defaults,
 
     getOptions: function (hash, info) {
