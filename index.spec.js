@@ -90,6 +90,10 @@ describe("hash()", function () {
       assert.notStrictEqual(hashes[0], hashes[1]);
     });
   });
+
+  it("can be verified", function () {
+    return hash("test").then((hash) => hashy.verify("test", hash));
+  });
 });
 
 describe("getInfo()", function () {
