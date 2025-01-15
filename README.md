@@ -163,7 +163,7 @@ code!
     } else {
       console.warn("invalid password!");
     }
-  }
+  },
 )();
 ```
 

@@ -131,7 +131,7 @@ describe("needsRehash()", function () {
       it("returns true if the algorithm or the options differs", function () {
         assert.strictEqual(
           needsRehash(datum.hash, datum.info.algorithm),
-          datum.needsRehash
+          datum.needsRehash,
         );
       });
     });

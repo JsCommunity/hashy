@@ -32,7 +32,7 @@ const makeAsyncWrapper = (function (push) {
         new Promise(function (resolve) {
           resolve(fn.apply(this, args));
         }),
-        callback
+        callback,
       );
     };
   };
@@ -213,7 +213,7 @@ function hash(password, algo, options) {
 
   return algo.hash(
     password,
-    Object.assign(Object.create(null), globalOptions[algo.name], options)
+    Object.assign(Object.create(null), globalOptions[algo.name], options),
   );
 }
 exports.hash = makeAsyncWrapper(hash);
@@ -265,7 +265,7 @@ function needsRehash(hash, algo, options) {
   const expected = Object.assign(
     Object.create(null),
     globalOptions[info.algorithm],
-    options
+    options,
   );
   const actual = info.options;
 
