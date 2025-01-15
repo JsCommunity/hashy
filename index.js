@@ -117,6 +117,7 @@ function registerAlgorithm(algo) {
       return options;
     },
     hash: argon2.hash,
+    needsRehash: argon2.needsRehash,
     verify: function (password, hash) {
       return argon2.verify(hash, password);
     },

@@ -44,7 +44,7 @@ const data = {
         timeCost: 3,
       },
     },
-    needsRehash: false,
+    needsRehash: true,
   },
   "argon2i with version": {
     value: "password",
@@ -59,9 +59,9 @@ const data = {
         version: 19,
       },
     },
-    needsRehash: false,
+    needsRehash: true,
   },
-  argon2id: {
+  "outdated argon2id": {
     value: "password",
     hash: "$argon2id$v=19$m=4096,t=3,p=1$y+oVGwJBgBWCU7nx3AJHFw$Athwv027c/e5qcddK4MZ30stAkkDfugD8VeB+3R2lJY",
     info: {
@@ -70,6 +70,21 @@ const data = {
       options: {
         memoryCost: 4096,
         parallelism: 1,
+        timeCost: 3,
+        version: 19,
+      },
+    },
+    needsRehash: true,
+  },
+  argon2id: {
+    value: "password",
+    hash: "$argon2id$v=19$m=65536,t=3,p=4$Iz7J5To/Eum0iDVAwfYSoQ$rZPYTyvAjdgmbdeRknwGS5ezhfeGCcUl07RVo7caa2o",
+    info: {
+      algorithm: "argon2",
+      id: "argon2id",
+      options: {
+        memoryCost: 65536,
+        parallelism: 4,
         timeCost: 3,
         version: 19,
       },

@@ -18,7 +18,7 @@
     "url": "http://julien.isonoe.net"
   },
   "engines": {
-    "node": ">=12"
+    "node": ">=16.17"
   },
   "bin": {
     "hashy": "cli.js"
@@ -31,7 +31,7 @@
     "url": "https://github.com/JsCommunity/hashy"
   },
   "dependencies": {
-    "argon2": "^0.28.5",
+    "argon2": "^0.41.1",
     "bcryptjs": "^2.4.3",
     "exec-promise": "^0.7.0",
     "promise-toolbox": "^0.21.0",
