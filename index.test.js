@@ -1,6 +1,6 @@
 "use strict";
 
-const { describe, it } = require("tap").mocha;
+const { describe, it } = require("node:test");
 const assert = require("assert");
 
 const hashy = require("./");
@@ -96,7 +96,7 @@ describe("hash()", function () {
     return hash("test");
   });
 
-  it("can work with callback", function (done) {
+  it("can work with callback", function (t, done) {
     hash("test", done);
   });
 

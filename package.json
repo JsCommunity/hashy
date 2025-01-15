@@ -43,12 +43,10 @@
     "globals": "^15.14.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.3.0",
-    "prettier": "^3.4.2",
-    "tap": "^15.1.6"
+    "prettier": "^3.4.2"
   },
   "scripts": {
-    "dev-test": "tap --no-check-coverage --watch",
-    "test": "tap --no-check-coverage && true",
+    "test": "node --test && true",
     "prepare": "husky"
   },
   "files": [
