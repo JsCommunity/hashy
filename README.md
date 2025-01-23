@@ -126,18 +126,17 @@ Same interface as above but without the callbacks!
 ```javascript
 // Hashing.
 hashy.hash(password).then(function (hash) {
-  console.log('generated hash:' hash)
-})
+  console.log("generated hash:", hash);
+});
 
 // Checking.
 hashy.verify(password, hash).then(function (success) {
   if (success) {
-    console.log('you are now authenticated!')
+    console.log("you are now authenticated!");
   } else {
-    console.warn('invalid password!')
+    console.warn("invalid password!");
   }
-})
-
+});
 ```
 
 As you can see, you don't even have to handle errors if you don't want
@@ -155,16 +154,16 @@ code!
 (async function () {
   const hash = await hashy.hash(password);
   console.log("generated hash:", hash);
-})()(
-  // Checking.
-  async function () {
-    if (await hashy.verify(password, hash)) {
-      console.log("you are now authenticated!");
-    } else {
-      console.warn("invalid password!");
-    }
-  },
-)();
+})();
+
+// Checking.
+(async function () {
+  if (await hashy.verify(password, hash)) {
+    console.log("you are now authenticated!");
+  } else {
+    console.warn("invalid password!");
+  }
+})();
 ```
 
 ## Contributing
