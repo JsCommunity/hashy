@@ -53,7 +53,7 @@ enable them.
 
 ## How to use it?
 
-First, you may take a look at examples: using [callbacks](https://github.com/JsCommunity/hashy/blob/master/examples/callbacks.js), [promises](https://github.com/JsCommunity/hashy/blob/master/examples/promises.js) or [async functions](https://github.com/JsCommunity/hashy/blob/master/examples/async.js) (requires Node >= 7.6).
+First, you may take a look at examples: using [callbacks](https://github.com/JsCommunity/hashy/blob/master/examples/callbacks.js), [promises](https://github.com/JsCommunity/hashy/blob/master/examples/promises.js) or [async functions](https://github.com/JsCommunity/hashy/blob/master/examples/async.js).
 
 ### Creating a hash
 
