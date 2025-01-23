@@ -69,7 +69,7 @@ hashy.hash(password, function (error, hash) {
 
 `hash()` handles additionaly two parameters which may be passed before the callback:
 
-1. `algo`: which algorithm to use, it defaults to `'bcrypt'`;
+1. `algo`: which algorithm to use, it defaults to `'argon2'`;
 2. `options`: additional options for the current algorithm, for bcrypt
    it defaults to `{cost: 10}.`.
 
