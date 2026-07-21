@@ -111,8 +111,15 @@ describe("hash()", function () {
     return hash("test");
   });
 
-  it("can work with callback", function (t, done) {
-    hash("test", done);
+  it("can work with callback", function () {
+    return new Promise(function (resolve, reject) {
+      hash("test", function (error, hash) {
+        if (error) {
+          return reject(error);
+        }
+        resolve(hash);
+      });
+    });
   });
 
   it("does not creates the same hash twice", function () {
@@ -136,13 +143,19 @@ describe("hash()", function () {
     );
   });
 
-  it("propagates errors to the callback", function (t, done) {
-    hash("test", "does-not-exist", function (error) {
-      if (error === undefined) {
-        return done(new Error("expected an error"));
-      }
-      assert.match(error.message, /no available algorithm with name/);
-      done();
+  it("propagates errors to the callback", function () {
+    return new Promise(function (resolve, reject) {
+      hash("test", "does-not-exist", function (error) {
+        if (error === undefined) {
+          return reject(new Error("expected an error"));
+        }
+        try {
+          assert.match(error.message, /no available algorithm with name/);
+          resolve();
+        } catch (assertionError) {
+          reject(assertionError);
+        }
+      });
     });
   });
 });
@@ -223,13 +236,23 @@ describe("verify()", function () {
     });
   });
 
-  it("can work with callback", function (t, done) {
-    verify(data.argon2id.value, data.argon2id.hash, function (error, success) {
-      if (error !== undefined) {
-        return done(error);
-      }
-      assert.strictEqual(success, true);
-      done();
+  it("can work with callback", function () {
+    return new Promise(function (resolve, reject) {
+      verify(
+        data.argon2id.value,
+        data.argon2id.hash,
+        function (error, success) {
+          if (error) {
+            return reject(error);
+          }
+          try {
+            assert.strictEqual(success, true);
+            resolve();
+          } catch (assertionError) {
+            reject(assertionError);
+          }
+        },
+      );
     });
   });
 });
