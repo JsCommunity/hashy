@@ -132,6 +132,17 @@ function registerAlgorithm(algo) {
 })(require("argon2"));
 
 (function (bcrypt) {
+  // Bcrypt silently truncates passwords over 72 bytes: two different
+  // passwords sharing the same 72-byte prefix would hash (and verify)
+  // identically. Reject upfront rather than let that go unnoticed.
+  function checkPasswordLength(password) {
+    if (bcrypt.truncates(password)) {
+      throw new Error(
+        "bcrypt cannot handle passwords over 72 bytes, use a different algorithm (e.g. argon2) or pre-hash the password",
+      );
+    }
+  }
+
   registerAlgorithm({
     name: "bcrypt",
     ids: ["2", "2a", "2b", "2x", "2y"],
@@ -143,6 +154,8 @@ function registerAlgorithm(algo) {
       };
     },
     hash: function (password, options) {
+      checkPasswordLength(password);
+
       return bcrypt.genSalt(options.cost).then(function (salt) {
         return bcrypt.hash(password, salt);
       });
@@ -156,6 +169,8 @@ function registerAlgorithm(algo) {
       // Otherwise, let the default algorithm decides.
     },
     verify: function (password, hash) {
+      checkPasswordLength(password);
+
       // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
       if (hash.startsWith("$2y$")) {
         hash = "$2a$" + hash.slice(4);

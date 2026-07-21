@@ -160,6 +160,32 @@ describe("hash()", function () {
   });
 });
 
+describe("bcrypt password length limit", function () {
+  const longPassword = "a".repeat(73);
+
+  it("hash() rejects passwords over 72 bytes", function () {
+    return hashy.hash(longPassword, "bcrypt").then(
+      function () {
+        throw new Error("expected the promise to be rejected");
+      },
+      function (error) {
+        assert.match(error.message, /72 bytes/);
+      },
+    );
+  });
+
+  it("verify() rejects passwords over 72 bytes", function () {
+    return hashy.verify(longPassword, data["bcrypt 2"].hash).then(
+      function () {
+        throw new Error("expected the promise to be rejected");
+      },
+      function (error) {
+        assert.match(error.message, /72 bytes/);
+      },
+    );
+  });
+});
+
 describe("getInfo()", function () {
   const getInfo = hashy.getInfo;
 

@@ -95,6 +95,13 @@ hashy.hash(password, function (error, hash) {
    [`argon2`](https://www.npmjs.com/package/argon2) package itself
    defaults to.
 
+> [!NOTE]
+> Bcrypt silently truncates passwords over 72 bytes, which means two
+> different passwords sharing the same 72-byte prefix would hash (and
+> verify) identically. To avoid this pitfall, `hash()` and `verify()`
+> reject with an error rather than truncate silently. If you need to
+> support longer passwords, use `argon2` (the default) instead.
+
 ### Checking a password against a hash
 
 ```js
