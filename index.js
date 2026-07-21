@@ -8,12 +8,14 @@
 
 // ===================================================================
 
-const promiseToolbox = require("promise-toolbox");
-
-const asCallback = promiseToolbox.asCallback;
-const promisifyAll = promiseToolbox.promisifyAll;
-
-// ===================================================================
+function asCallback(promise, cb) {
+  if (typeof cb === "function") {
+    promise.then(function (value) {
+      cb(undefined, value);
+    }, cb);
+  }
+  return promise;
+}
 
 // Similar to Bluebird.method(fn) but handle Node callbacks.
 const makeAsyncWrapper = (function (push) {
@@ -28,7 +30,7 @@ const makeAsyncWrapper = (function (push) {
         callback = args.pop();
       }
 
-      return asCallback.call(
+      return asCallback(
         new Promise(function (resolve) {
           resolve(fn.apply(this, args));
         }),
@@ -82,7 +84,6 @@ function registerAlgorithm(algo) {
   registerAlgorithm({
     name: "argon2",
     ids: ["argon2d", "argon2i", "argon2id"],
-    defaults: require("argon2").defaults,
 
     getOptions: function (hash, info) {
       let rawOptions = info.options;
@@ -117,7 +118,13 @@ function registerAlgorithm(algo) {
       return options;
     },
     hash: argon2.hash,
-    needsRehash: argon2.needsRehash,
+    // Delegates to argon2's own comparison against `expected` (the
+    // configured global/per-call options) instead of hardcoding a copy
+    // of argon2's defaults: whatever is left unset is compared against
+    // argon2's own current defaults directly.
+    needsRehash: function (hash, info, expected) {
+      return argon2.needsRehash(hash, expected);
+    },
     verify: function (password, hash) {
       return argon2.verify(hash, password);
     },
@@ -157,7 +164,7 @@ function registerAlgorithm(algo) {
       return bcrypt.compare(password, hash);
     },
   });
-})(promisifyAll(require("bcryptjs")));
+})(require("bcryptjs"));
 
 // -------------------------------------------------------------------
 
@@ -257,17 +264,18 @@ function needsRehash(hash, algo, options) {
     return true;
   }
 
-  const algoNeedsRehash = getAlgorithmFromId(info.id).needsRehash;
-  const result = algoNeedsRehash && algoNeedsRehash(hash, info);
-  if (typeof result === "boolean") {
-    return result;
-  }
-
   const expected = Object.assign(
     Object.create(null),
     globalOptions[info.algorithm],
     options,
   );
+
+  const algoNeedsRehash = getAlgorithmFromId(info.id).needsRehash;
+  const result = algoNeedsRehash && algoNeedsRehash(hash, info, expected);
+  if (typeof result === "boolean") {
+    return result;
+  }
+
   const actual = info.options;
 
   for (const prop in actual) {

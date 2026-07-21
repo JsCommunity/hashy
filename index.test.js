@@ -124,6 +124,27 @@ describe("hash()", function () {
   it("can be verified", function () {
     return hash("test").then((hash) => hashy.verify("test", hash));
   });
+
+  it("rejects for an unknown algorithm", function () {
+    return hash("test", "does-not-exist").then(
+      function () {
+        throw new Error("expected the promise to be rejected");
+      },
+      function (error) {
+        assert.match(error.message, /no available algorithm with name/);
+      },
+    );
+  });
+
+  it("propagates errors to the callback", function (t, done) {
+    hash("test", "does-not-exist", function (error) {
+      if (error === undefined) {
+        return done(new Error("expected an error"));
+      }
+      assert.match(error.message, /no available algorithm with name/);
+      done();
+    });
+  });
 });
 
 describe("getInfo()", function () {
@@ -135,6 +156,18 @@ describe("getInfo()", function () {
         assert.deepStrictEqual(getInfo(datum.hash), datum.info);
       });
     });
+  });
+
+  it("throws for a malformed hash", function () {
+    assert.throws(function () {
+      getInfo("not-a-hash");
+    }, /invalid hash/);
+  });
+
+  it("throws for an unknown algorithm id", function () {
+    assert.throws(function () {
+      getInfo("$does-not-exist$options$rest");
+    }, /no available algorithm with id/);
   });
 });
 
@@ -151,6 +184,30 @@ describe("needsRehash()", function () {
       });
     });
   });
+
+  it("returns true when a different algorithm is requested", function () {
+    assert.strictEqual(needsRehash(data.argon2id.hash, "bcrypt"), true);
+  });
+
+  it("forces a rehash for legacy Bcrypt ids", function () {
+    // ids other than 2a, 2b and 2y are always considered outdated,
+    // regardless of cost.
+    const hash = data["bcrypt 2"].hash.replace("$2y$", "$2$");
+    assert.strictEqual(needsRehash(hash, "bcrypt"), true);
+  });
+
+  it("respects custom global options for argon2", function () {
+    return hashy
+      .hash("test")
+      .then(function (hash) {
+        // Well above argon2's own default, whatever it currently is.
+        hashy.options.argon2.memoryCost = 1 << 20;
+        assert.strictEqual(needsRehash(hash, "argon2"), true);
+      })
+      .finally(function () {
+        delete hashy.options.argon2.memoryCost;
+      });
+  });
 });
 
 describe("verify()", function () {
@@ -163,6 +220,16 @@ describe("verify()", function () {
           assert.strictEqual(success, true);
         });
       });
+    });
+  });
+
+  it("can work with callback", function (t, done) {
+    verify(data.argon2id.value, data.argon2id.hash, function (error, success) {
+      if (error !== undefined) {
+        return done(error);
+      }
+      assert.strictEqual(success, true);
+      done();
     });
   });
 });
