@@ -13,20 +13,15 @@ const hashy = require("./");
 
 // ====================================================================
 
-function main(argv) {
+async function main(argv) {
   const yargs = yargsFactory();
   // TESTABILITY: makes yargs throw instead of exiting, including from its
   // built-in --help/--version handling (which prints and would otherwise
   // call process.exit() before main() below ever gets to run).
   yargs.exitProcess(false);
-  yargs.fail(function (msg) {
-    let help = yargs.help();
-
-    if (msg) {
-      help += "\n" + msg;
-    }
-
-    throw help;
+  yargs.fail((msg) => {
+    const help = yargs.help();
+    throw msg ? `${help}\n${msg}` : help;
   });
 
   const options = yargs
@@ -62,24 +57,20 @@ function main(argv) {
   const args = options._;
 
   if (args.length === 1) {
-    return hashy.hash(args[0], options.a).then(console.log);
+    console.log(await hashy.hash(args[0], options.a));
+    return;
   }
 
   if (args.length === 2) {
-    const password = args[0];
-    const hash = args[1];
+    const [password, hash] = args;
 
-    return hashy.verify(password, hash).then(function (success) {
-      if (success) {
-        if (hashy.needsRehash(hash, options.a)) {
-          return "ok but password should be rehashed";
-        }
-
-        return "ok";
-      }
-
+    if (!(await hashy.verify(password, hash))) {
       throw new Error("not ok");
-    });
+    }
+
+    return hashy.needsRehash(hash, options.a)
+      ? "ok but password should be rehashed"
+      : "ok";
   }
 
   throw new Error("incorrect number of arguments");
@@ -94,17 +85,15 @@ function prettyFormat(value) {
   }
 
   if (value instanceof Error) {
-    return value.message + "\n" + value.stack;
+    return `${value.message}\n${value.stack}`;
   }
 
   return JSON.stringify(value, null, 2);
 }
 
-if (!module.parent) {
-  new Promise(function (resolve) {
-    resolve(main(process.argv.slice(2)));
-  }).then(
-    function (value) {
+if (require.main === module) {
+  main(process.argv.slice(2)).then(
+    (value) => {
       if (typeof value === "number" && value % 1 === 0) {
         return process.exit(value);
       }
@@ -114,7 +103,7 @@ if (!module.parent) {
       }
       process.exit(0);
     },
-    function (error) {
+    (error) => {
       console.error(prettyFormat(error));
       process.exit(1);
     },

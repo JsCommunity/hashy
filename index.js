@@ -8,37 +8,19 @@
 
 // ===================================================================
 
-function asCallback(promise, cb) {
-  if (typeof cb === "function") {
-    promise.then(function (value) {
-      cb(undefined, value);
-    }, cb);
-  }
-  return promise;
-}
-
 // Similar to Bluebird.method(fn) but handle Node callbacks.
-const makeAsyncWrapper = (function (push) {
-  return function makeAsyncWrapper(fn) {
-    return function asyncWrapper() {
-      const args = [];
-      push.apply(args, arguments);
-      let callback;
+function makeAsyncWrapper(fn) {
+  return function asyncWrapper(...args) {
+    const callback =
+      typeof args[args.length - 1] === "function" ? args.pop() : undefined;
 
-      const n = args.length;
-      if (n && typeof args[n - 1] === "function") {
-        callback = args.pop();
-      }
-
-      return asCallback(
-        new Promise(function (resolve) {
-          resolve(fn.apply(this, args));
-        }),
-        callback,
-      );
-    };
+    const promise = (async () => fn(...args))();
+    if (callback !== undefined) {
+      promise.then((value) => callback(undefined, value), callback);
+    }
+    return promise;
   };
-})(Array.prototype.push);
+}
 
 // ===================================================================
 
@@ -51,22 +33,20 @@ exports.options = globalOptions;
 let DEFAULT_ALGO;
 Object.defineProperty(exports, "DEFAULT_ALGO", {
   enumerable: true,
-  get: function () {
-    return DEFAULT_ALGO;
-  },
+  get: () => DEFAULT_ALGO,
 });
 
 function registerAlgorithm(algo) {
-  const name = algo.name;
+  const { name } = algo;
 
   if (algorithmsByName[name]) {
-    throw new Error("name " + name + " already taken");
+    throw new Error(`name ${name} already taken`);
   }
   algorithmsByName[name] = algo;
 
-  algo.ids.forEach(function (id) {
+  algo.ids.forEach((id) => {
     if (algorithmsById[id]) {
-      throw new Error("id " + id + " already taken");
+      throw new Error(`id ${id} already taken`);
     }
     algorithmsById[id] = algo;
   });
@@ -80,127 +60,115 @@ function registerAlgorithm(algo) {
 
 // -------------------------------------------------------------------
 
-(function (argon2) {
-  registerAlgorithm({
-    name: "argon2",
-    ids: ["argon2d", "argon2i", "argon2id"],
+const argon2 = require("argon2");
 
-    getOptions: function (hash, info) {
-      let rawOptions = info.options;
-      let options = {};
+registerAlgorithm({
+  name: "argon2",
+  ids: ["argon2d", "argon2i", "argon2id"],
 
-      // Since Argon2 1.3, the version number is encoded in the hash.
-      let version;
-      if (rawOptions.slice(0, 2) === "v=") {
-        version = +rawOptions.slice(2);
+  getOptions: (hash, info) => {
+    let rawOptions = info.options;
+    let options = {};
 
-        const index = hash.indexOf(rawOptions) + rawOptions.length + 1;
-        rawOptions = hash.slice(index, hash.indexOf("$", index));
-      }
+    // Since Argon2 1.3, the version number is encoded in the hash.
+    let version;
+    if (rawOptions.slice(0, 2) === "v=") {
+      version = +rawOptions.slice(2);
 
-      rawOptions.split(",").forEach(function (datum) {
-        const index = datum.indexOf("=");
-        if (index === -1) {
-          options[datum] = true;
-        } else {
-          options[datum.slice(0, index)] = datum.slice(index + 1);
-        }
-      });
-
-      options = {
-        memoryCost: +options.m,
-        parallelism: +options.p,
-        timeCost: +options.t,
-      };
-      if (version !== undefined) {
-        options.version = version;
-      }
-      return options;
-    },
-    hash: argon2.hash,
-    // Delegates to argon2's own comparison against `expected` (the
-    // configured global/per-call options) instead of hardcoding a copy
-    // of argon2's defaults: whatever is left unset is compared against
-    // argon2's own current defaults directly.
-    needsRehash: function (hash, info, expected) {
-      return argon2.needsRehash(hash, expected);
-    },
-    verify: function (password, hash) {
-      return argon2.verify(hash, password);
-    },
-  });
-})(require("argon2"));
-
-(function (bcrypt) {
-  // Bcrypt silently truncates passwords over 72 bytes: two different
-  // passwords sharing the same 72-byte prefix would hash (and verify)
-  // identically. Reject upfront rather than let that go unnoticed.
-  function checkPasswordLength(password) {
-    if (bcrypt.truncates(password)) {
-      throw new Error(
-        "bcrypt cannot handle passwords over 72 bytes, use a different algorithm (e.g. argon2) or pre-hash the password",
-      );
+      const index = hash.indexOf(rawOptions) + rawOptions.length + 1;
+      rawOptions = hash.slice(index, hash.indexOf("$", index));
     }
+
+    rawOptions.split(",").forEach((datum) => {
+      const index = datum.indexOf("=");
+      if (index === -1) {
+        options[datum] = true;
+      } else {
+        options[datum.slice(0, index)] = datum.slice(index + 1);
+      }
+    });
+
+    options = {
+      memoryCost: +options.m,
+      parallelism: +options.p,
+      timeCost: +options.t,
+    };
+    if (version !== undefined) {
+      options.version = version;
+    }
+    return options;
+  },
+  hash: argon2.hash,
+  // Delegates to argon2's own comparison against `expected` (the
+  // configured global/per-call options) instead of hardcoding a copy
+  // of argon2's defaults: whatever is left unset is compared against
+  // argon2's own current defaults directly.
+  needsRehash: (hash, info, expected) => argon2.needsRehash(hash, expected),
+  verify: (password, hash) => argon2.verify(hash, password),
+});
+
+const bcrypt = require("bcryptjs");
+
+// Bcrypt silently truncates passwords over 72 bytes: two different
+// passwords sharing the same 72-byte prefix would hash (and verify)
+// identically. Reject upfront rather than let that go unnoticed.
+function checkBcryptPasswordLength(password) {
+  if (bcrypt.truncates(password)) {
+    throw new Error(
+      "bcrypt cannot handle passwords over 72 bytes, use a different algorithm (e.g. argon2) or pre-hash the password",
+    );
   }
+}
 
-  registerAlgorithm({
-    name: "bcrypt",
-    ids: ["2", "2a", "2b", "2x", "2y"],
-    defaults: { cost: 10 },
+registerAlgorithm({
+  name: "bcrypt",
+  ids: ["2", "2a", "2b", "2x", "2y"],
+  defaults: { cost: 10 },
 
-    getOptions: function (_, info) {
-      return {
-        cost: +info.options,
-      };
-    },
-    hash: function (password, options) {
-      checkPasswordLength(password);
+  getOptions: (_, { options }) => ({ cost: +options }),
+  hash: async (password, options) => {
+    checkBcryptPasswordLength(password);
+    return bcrypt.hash(password, await bcrypt.genSalt(options.cost));
+  },
+  needsRehash: (_, { id }) => {
+    if (id !== "2a" && id !== "2b" && id !== "2y") {
+      return true;
+    }
 
-      return bcrypt.genSalt(options.cost).then(function (salt) {
-        return bcrypt.hash(password, salt);
-      });
-    },
-    needsRehash: function (_, info) {
-      const id = info.id;
-      if (id !== "2a" && id !== "2b" && id !== "2y") {
-        return true;
-      }
+    // Otherwise, let the default algorithm decides.
+  },
+  verify: (password, hash) => {
+    checkBcryptPasswordLength(password);
 
-      // Otherwise, let the default algorithm decides.
-    },
-    verify: function (password, hash) {
-      checkPasswordLength(password);
+    // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
+    if (hash.startsWith("$2y$")) {
+      hash = "$2a$" + hash.slice(4);
+    }
 
-      // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
-      if (hash.startsWith("$2y$")) {
-        hash = "$2a$" + hash.slice(4);
-      }
-
-      return bcrypt.compare(password, hash);
-    },
-  });
-})(require("bcryptjs"));
+    return bcrypt.compare(password, hash);
+  },
+});
 
 // -------------------------------------------------------------------
 
-const getHashInfo = (function (HASH_RE) {
-  return function getHashInfo(hash) {
-    const matches = hash.match(HASH_RE);
-    if (!matches) {
-      throw new Error("invalid hash " + hash);
-    }
+const HASH_RE = /^\$([^$]+)\$([^$]*)\$/;
 
-    return {
-      id: matches[1],
-      options: matches[2],
-    };
+function getHashInfo(hash) {
+  const matches = hash.match(HASH_RE);
+  if (!matches) {
+    throw new Error(`invalid hash ${hash}`);
+  }
+
+  return {
+    id: matches[1],
+    options: matches[2],
   };
-})(/^\$([^$]+)\$([^$]*)\$/);
+}
 
 function getAlgorithmByName(name) {
   const algo = algorithmsByName[name];
   if (!algo) {
-    throw new Error("no available algorithm with name " + name);
+    throw new Error(`no available algorithm with name ${name}`);
   }
 
   return algo;
@@ -209,7 +177,7 @@ function getAlgorithmByName(name) {
 function getAlgorithmFromId(id) {
   const algo = algorithmsById[id];
   if (!algo) {
-    throw new Error("no available algorithm with id " + id);
+    throw new Error(`no available algorithm with id ${id}`);
   }
 
   return algo;

@@ -88,10 +88,15 @@ describe("cli", function () {
       );
   });
 
-  it("throws on an incorrect number of arguments", function () {
-    assert.throws(function () {
-      cli([]);
-    }, /incorrect number of arguments/);
+  it("rejects on an incorrect number of arguments", function () {
+    return cli([]).then(
+      function () {
+        throw new Error("expected the call to be rejected");
+      },
+      function (error) {
+        assert.match(error.message, /incorrect number of arguments/);
+      },
+    );
   });
 
   it("displays the help message", function () {
