@@ -1,17 +1,17 @@
 # Hashy
 
-[![Node compatibility](https://badgen.net/npm/node/hashy)](https://npmjs.org/package/hashy) [![License](https://badgen.net/npm/license/hashy)](https://npmjs.org/package/hashy) [![PackagePhobia](https://badgen.net/packagephobia/install/hashy)](https://packagephobia.now.sh/result?p=hashy)
+[![Node compatibility](https://badgen.net/npm/node/hashy)](https://npmjs.org/package/hashy) [![License](https://badgen.net/npm/license/hashy)](https://npmjs.org/package/hashy) [![PackagePhobia](https://badgen.net/packagephobia/install/hashy)](https://packagephobia.com/result?p=hashy)
 
-[![Package Version](https://badgen.net/npm/v/hashy)](https://npmjs.org/package/hashy) [![Build Status](https://travis-ci.org/JsCommunity/hashy.png?branch=master)](https://travis-ci.org/JsCommunity/hashy) [![Latest Commit](https://badgen.net/github/last-commit/JsCommunity/hashy)](https://github.com/JsCommunity/hashy/commits/master)
+[![Package Version](https://badgen.net/npm/v/hashy)](https://npmjs.org/package/hashy) [![Build Status](https://github.com/JsCommunity/hashy/actions/workflows/ci.yml/badge.svg)](https://github.com/JsCommunity/hashy/actions/workflows/ci.yml) [![Latest Commit](https://badgen.net/github/last-commit/JsCommunity/hashy)](https://github.com/JsCommunity/hashy/commits/master)
 
 > Hash passwords the right way (Argon2 & bcrypt support)
 
-Hashy is small [Node.js](http://nodejs.org/) library which aims to do
+Hashy is small [Node.js](https://nodejs.org/) library which aims to do
 passwords hashing _[the correct
 way](https://wiki.php.net/rfc/password_hash)_.
 
 It has been heavily inspired by the new [PHP password hashing
-API](http://www.php.net/manual/en/book.password.php) but, following
+API](https://www.php.net/manual/en/book.password.php) but, following
 the Node.js philosophy, hashing is done asynchronously.
 
 Furthermore, to make the interfaces as easy to use as possible, async
@@ -29,11 +29,11 @@ Supported algorithms:
 The other ones I found were too complicated and/or were missing
 important features.
 
-The main missing feature is the `needRehash()` function: cryptography
+The main missing feature is the `needsRehash()` function: cryptography
 is a fast-moving science and algorithms can quickly become obsolete or
 their parameters needs to be adjusted to compensate the performance
 increase of recent computers (e.g. [bcrypt cost
-factor](http://phpmaster.com/why-you-should-use-bcrypt-to-hash-stored-passwords/)).
+factor](https://phpmaster.com/why-you-should-use-bcrypt-to-hash-stored-passwords/)).
 
 This is exactly what this function is for: checking whether a hash
 uses the correct algorithm (and options) to see if we need to compute
@@ -47,9 +47,29 @@ Installation of the npm package:
 > npm install --save hashy
 ```
 
-Hashy requires promises support, for Node versions prior to 0.12 [see
-this page](https://github.com/JsCommunity/promise-toolbox#usage) to
-enable them.
+## Command line
+
+Hashy also comes with a `hashy` executable, install it globally to use
+it from anywhere:
+
+```
+> npm install --global hashy
+```
+
+Hashing a password:
+
+```
+> hashy [ -a <algorithm> ] <secret>
+```
+
+Verifying a password against a hash:
+
+```
+> hashy <secret> <hash>
+```
+
+Use `-c`/`--cost` to change the cost when hashing or verifying with
+Bcrypt, and `hashy --help` for the full list of options.
 
 ## How to use it?
 
@@ -60,25 +80,27 @@ First, you may take a look at examples: using [callbacks](https://github.com/JsC
 ```js
 hashy.hash(password, function (error, hash) {
   if (error) {
-    return console.log(error);
+    return console.error(error);
   }
 
   console.log("generated hash: ", hash);
 });
 ```
 
-`hash()` handles additionaly two parameters which may be passed before the callback:
+`hash()` handles additionally two parameters which may be passed before the callback:
 
-1. `algo`: which algorithm to use, it defaults to `'argon2'`;
+1. `algo`: which algorithm to use, it defaults to `"argon2"`;
 2. `options`: additional options for the current algorithm, for bcrypt
-   it defaults to `{cost: 10}.`.
+   it defaults to `{ cost: 10 }`, for argon2 to whatever the
+   [`argon2`](https://www.npmjs.com/package/argon2) package itself
+   defaults to.
 
 ### Checking a password against a hash
 
 ```js
 hashy.verify(password, hash, function (error, success) {
   if (error) {
-    return console.error(err);
+    return console.error(error);
   }
 
   if (success) {
@@ -110,9 +132,9 @@ if (hashy.needsRehash(hash)) {
 It handles the optional `algo` and `options` parameters like
 [`hash()`](#creating-a-hash).
 
-### Changing default options.
+### Changing default options
 
-The default options for a given algorithm is available at `hashy.options[&gt;algo&lt;]`.
+The default options for a given algorithm is available at `hashy.options[<algo>]`.
 
 ```js
 // Sets the default cost for bcrypt to 12.
@@ -143,8 +165,6 @@ As you can see, you don't even have to handle errors if you don't want
 to!
 
 ## Using async functions
-
-**Note:** only available since Node.js 7.6.
 
 Same interface as promises but much more similar to a synchronous
 code!
