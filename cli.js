@@ -2,17 +2,10 @@
 
 "use strict";
 
-const yargs = require("yargs");
-// TESTABILITY: makes yargs throws instead of exiting.
-yargs.fail(function (msg) {
-  let help = yargs.help();
-
-  if (msg) {
-    help += "\n" + msg;
-  }
-
-  throw help;
-});
+// Builds a fresh parser per call instead of reusing the singleton from
+// require("yargs"), which would otherwise accumulate aliases/examples
+// across repeated main() calls in the same process.
+const yargsFactory = require("yargs/yargs");
 
 // --------------------------------------------------------------------
 
@@ -21,24 +14,33 @@ const hashy = require("./");
 // ====================================================================
 
 function main(argv) {
+  const yargs = yargsFactory();
+  // TESTABILITY: makes yargs throw instead of exiting, including from its
+  // built-in --help/--version handling (which prints and would otherwise
+  // call process.exit() before main() below ever gets to run).
+  yargs.exitProcess(false);
+  yargs.fail(function (msg) {
+    let help = yargs.help();
+
+    if (msg) {
+      help += "\n" + msg;
+    }
+
+    throw help;
+  });
+
   const options = yargs
     .usage("Usage: hashy [<option>...]")
     .example("hashy [ -a <algorithm> ] <secret>", "hash the secret")
     .example("hashy <secret> <hash>", "verify the secret using the hash")
+    // Aliases rather than options: yargs already owns "help" and
+    // "version" as built-in commands and warns if they are redefined.
+    .alias("h", "help")
+    .alias("v", "version")
     .options({
       a: {
         default: hashy.DEFAULT_ALGO,
         describe: "algorithm to use for hashing",
-      },
-      h: {
-        alias: "help",
-        boolean: true,
-        describe: "display this help message",
-      },
-      v: {
-        alias: "version",
-        boolean: true,
-        describe: "display the version number",
       },
       c: {
         alias: "cost",
@@ -47,13 +49,10 @@ function main(argv) {
     })
     .parse(argv);
 
-  if (options.help) {
-    return yargs.help();
-  }
-
-  if (options.version) {
-    const pkg = require("./package");
-    return "Hashy version " + pkg.version;
+  // yargs' built-in --help/--version handling already printed the
+  // relevant text as a side effect of .parse() above.
+  if (options.help || options.version) {
+    return;
   }
 
   if (options.cost) {
@@ -89,6 +88,35 @@ exports = module.exports = main;
 
 // ====================================================================
 
+function prettyFormat(value) {
+  if (typeof value === "string") {
+    return value;
+  }
+
+  if (value instanceof Error) {
+    return value.message + "\n" + value.stack;
+  }
+
+  return JSON.stringify(value, null, 2);
+}
+
 if (!module.parent) {
-  require("exec-promise")(main);
+  new Promise(function (resolve) {
+    resolve(main(process.argv.slice(2)));
+  }).then(
+    function (value) {
+      if (typeof value === "number" && value % 1 === 0) {
+        return process.exit(value);
+      }
+
+      if (value !== undefined) {
+        console.log(prettyFormat(value));
+      }
+      process.exit(0);
+    },
+    function (error) {
+      console.error(prettyFormat(error));
+      process.exit(1);
+    },
+  );
 }
