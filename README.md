@@ -32,8 +32,8 @@ important features.
 The main missing feature is the `needsRehash()` function: cryptography
 is a fast-moving science and algorithms can quickly become obsolete or
 their parameters needs to be adjusted to compensate the performance
-increase of recent computers (e.g. [bcrypt cost
-factor](https://phpmaster.com/why-you-should-use-bcrypt-to-hash-stored-passwords/)).
+increase of recent computers (see [OWASP's recommended work
+factors](https://cheatsheetseries.owasp.org/cheatsheets/Password_Storage_Cheat_Sheet.html)).
 
 This is exactly what this function is for: checking whether a hash
 uses the correct algorithm (and options) to see if we need to compute
@@ -166,11 +166,11 @@ hashy.verify(password, hash).then(function (success) {
   } else {
     console.warn("invalid password!");
   }
-});
+}, console.error);
 ```
 
-As you can see, you don't even have to handle errors if you don't want
-to!
+Don't forget to handle errors: the promises reject on invalid input
+(unknown algorithm, malformed hash…).
 
 ## Using async functions
 
