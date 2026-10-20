@@ -2,6 +2,7 @@
 
 const { describe, it } = require("node:test");
 const assert = require("assert");
+const { inspect } = require("node:util");
 
 const argon2 = require("argon2");
 const bcrypt = require("bcryptjs");
@@ -135,6 +136,19 @@ describe("hash()", function () {
     return hash("test").then((hash) => hashy.verify("test", hash));
   });
 
+  [NaN, 0, 3, 32, 12.5, "4"].forEach(function (cost) {
+    it(`rejects an invalid bcrypt cost (${inspect(cost)})`, function () {
+      return hash("test", "bcrypt", { cost }).then(
+        function () {
+          throw new Error("expected the promise to be rejected");
+        },
+        function (error) {
+          assert.match(error.message, /bcrypt cost must be an integer/);
+        },
+      );
+    });
+  });
+
   it("rejects for an unknown algorithm", function () {
     return hash("test", "does-not-exist").then(
       function () {
@@ -234,6 +248,12 @@ describe("needsRehash()", function () {
     // regardless of cost.
     const hash = data["bcrypt 2"].hash.replace("$2y$", "$2$");
     assert.strictEqual(needsRehash(hash, "bcrypt"), true);
+  });
+
+  it("throws for an invalid bcrypt cost", function () {
+    assert.throws(function () {
+      needsRehash(data["bcrypt 2"].hash, "bcrypt", { cost: NaN });
+    }, /bcrypt cost must be an integer/);
   });
 
   it("returns true for a different argon2 variant", function () {

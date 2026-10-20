@@ -130,6 +130,15 @@ function checkBcryptPasswordLength(password) {
   }
 }
 
+// bcryptjs silently replaces invalid costs (e.g. NaN → 10, 50 → 31).
+function checkBcryptCost(cost) {
+  if (!Number.isInteger(cost) || cost < 4 || cost > 31) {
+    throw new Error(
+      `bcrypt cost must be an integer between 4 and 31, got ${cost}`,
+    );
+  }
+}
+
 registerAlgorithm({
   name: "bcrypt",
   ids: ["2", "2a", "2b", "2x", "2y"],
@@ -138,9 +147,12 @@ registerAlgorithm({
   getOptions: (_, { options }) => ({ cost: +options }),
   hash: async (password, options) => {
     checkBcryptPasswordLength(password);
+    checkBcryptCost(options.cost);
     return bcrypt.hash(password, await bcrypt.genSalt(options.cost));
   },
-  needsRehash: (_, { id }) => {
+  needsRehash: (_, { id }, expected) => {
+    checkBcryptCost(expected.cost);
+
     if (id !== "2a" && id !== "2b" && id !== "2y") {
       return true;
     }

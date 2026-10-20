@@ -11,6 +11,11 @@ const hashy = require("./index.js");
 // Sets a small cost for Bcrypt to speed up the tests.
 hashy.options.bcrypt.cost = 4;
 
+// `-c` sets the cost globally, tests using it must restore it.
+const restoreCost = () => {
+  hashy.options.bcrypt.cost = 4;
+};
+
 // `cli(["-a", "algo", "<secret>"])` logs the hash instead of resolving
 // with it, so tests that need the produced hash capture stdout.
 function captureLog(fn) {
@@ -52,11 +57,40 @@ describe("cli", function () {
   });
 
   it("supports -c to set the Bcrypt cost", function () {
-    return captureLog(() => cli(["-a", "bcrypt", "-c", "5", "secret"])).then(
-      function (output) {
+    return captureLog(() => cli(["-a", "bcrypt", "-c", "5", "secret"]))
+      .then(function (output) {
         assert.match(output, /^\$2[aby]\$05\$/);
-      },
-    );
+      })
+      .finally(restoreCost);
+  });
+
+  ["abc", "", "12.5", "50"].forEach(function (cost) {
+    it(`rejects an invalid -c (${JSON.stringify(cost)})`, function () {
+      return cli(["-a", "bcrypt", "-c", cost, "secret"])
+        .then(
+          function () {
+            throw new Error("expected the call to be rejected");
+          },
+          function (error) {
+            assert.match(error.message, /bcrypt cost must be an integer/);
+          },
+        )
+        .finally(restoreCost);
+    });
+  });
+
+  it("rejects an invalid -c when verifying", function () {
+    return captureLog(() => cli(["-a", "bcrypt", "secret"]))
+      .then((hash) => cli(["-a", "bcrypt", "-c", "abc", "secret", hash]))
+      .then(
+        function () {
+          throw new Error("expected the call to be rejected");
+        },
+        function (error) {
+          assert.match(error.message, /bcrypt cost must be an integer/);
+        },
+      )
+      .finally(restoreCost);
   });
 
   it("verifies a matching password/hash pair", function () {

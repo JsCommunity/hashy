@@ -51,8 +51,8 @@ async function main(argv) {
     return;
   }
 
-  if (options.cost) {
-    hashy.options.bcrypt.cost = +options.cost;
+  if (options.cost !== undefined) {
+    hashy.options.bcrypt.cost = Number(options.cost);
   }
 
   if (args.length === 1) {
