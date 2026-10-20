@@ -14,10 +14,9 @@ It has been heavily inspired by the new [PHP password hashing
 API](https://www.php.net/manual/en/book.password.php) but, following
 the Node.js philosophy, hashing is done asynchronously.
 
-Furthermore, to make the interfaces as easy to use as possible, async
-functions can either be used with callbacks or they return
-[promises](https://en.wikipedia.org/wiki/Promise_%28programming%29)
-which will make them super easy to work with [async functions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/async_function)!
+Asynchronous functions return promises, ready to be used with
+[`await`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/await),
+and also accept [callbacks](#callbacks).
 
 Supported algorithms:
 
@@ -73,21 +72,15 @@ Bcrypt, and `hashy --help` for the full list of options.
 
 ## How to use it?
 
-First, you may take a look at examples: using [callbacks](https://github.com/JsCommunity/hashy/blob/master/examples/callbacks.js), [promises](https://github.com/JsCommunity/hashy/blob/master/examples/promises.js) or [async functions](https://github.com/JsCommunity/hashy/blob/master/examples/async.js).
+First, you may take a look at [the example](https://github.com/JsCommunity/hashy/blob/master/examples/async.js).
 
 ### Creating a hash
 
 ```js
-hashy.hash(password, function (error, hash) {
-  if (error) {
-    return console.error(error);
-  }
-
-  console.log("generated hash: ", hash);
-});
+const hash = await hashy.hash(password);
 ```
 
-`hash()` handles additionally two parameters which may be passed before the callback:
+`hash()` handles two additional optional parameters:
 
 1. `algo`: which algorithm to use, it defaults to `"argon2"`;
 2. `options`: additional options for the current algorithm, for bcrypt
@@ -106,18 +99,16 @@ hashy.hash(password, function (error, hash) {
 ### Checking a password against a hash
 
 ```js
-hashy.verify(password, hash, function (error, success) {
-  if (error) {
-    return console.error(error);
-  }
-
-  if (success) {
-    console.log("you are now authenticated!");
-  } else {
-    console.warn("invalid password!");
-  }
-});
+if (await hashy.verify(password, hash)) {
+  console.log("you are now authenticated!");
+} else {
+  console.warn("invalid password!");
+}
 ```
+
+> [!IMPORTANT]
+> `hash()` and `verify()` reject on invalid input (unknown algorithm,
+> malformed hash…): handle errors with `try`/`catch` as usual.
 
 ### Getting information about a hash
 
@@ -149,17 +140,13 @@ The default options for a given algorithm is available at `hashy.options[<algo>]
 hashy.options.bcrypt.cost = 12;
 ```
 
-## Using promises
+## Alternatives
 
-Same interface as above but without the callbacks!
+### Promises
 
-```javascript
-// Hashing.
-hashy.hash(password).then(function (hash) {
-  console.log("generated hash:", hash);
-});
+See [the example](https://github.com/JsCommunity/hashy/blob/master/examples/promises.js).
 
-// Checking.
+```js
 hashy.verify(password, hash).then(function (success) {
   if (success) {
     console.log("you are now authenticated!");
@@ -169,29 +156,22 @@ hashy.verify(password, hash).then(function (success) {
 }, console.error);
 ```
 
-Don't forget to handle errors: the promises reject on invalid input
-(unknown algorithm, malformed hash…).
+### Callbacks
 
-## Using async functions
+The callback is passed last, after the optional parameters. See [the example](https://github.com/JsCommunity/hashy/blob/master/examples/callbacks.js).
 
-Same interface as promises but much more similar to a synchronous
-code!
+```js
+hashy.verify(password, hash, function (error, success) {
+  if (error) {
+    return console.error(error);
+  }
 
-```javascript
-// Hashing.
-(async function () {
-  const hash = await hashy.hash(password);
-  console.log("generated hash:", hash);
-})();
-
-// Checking.
-(async function () {
-  if (await hashy.verify(password, hash)) {
+  if (success) {
     console.log("you are now authenticated!");
   } else {
     console.warn("invalid password!");
   }
-})();
+});
 ```
 
 ## Contributing
