@@ -4,6 +4,8 @@ All notable changes to this project are documented in this file, following [Keep
 
 ## Unreleased
 
+## 0.14.0 - 2026-10-20
+
 ### Breaking changes
 
 - `hash()` rejects bcrypt passwords over 72 bytes instead of silently truncating them. `verify()` still accepts existing hashes of such passwords so they can be rehashed (e.g. with Argon2).
