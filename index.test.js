@@ -133,7 +133,17 @@ describe("hash()", function () {
   });
 
   it("can be verified", function () {
-    return hash("test").then((hash) => hashy.verify("test", hash));
+    return hash("test")
+      .then((hash) => hashy.verify("test", hash))
+      .then(function (success) {
+        assert.strictEqual(success, true);
+      });
+  });
+
+  it("accepts per-call options", function () {
+    return hash("test", "bcrypt", { cost: 4 }).then(function (hash) {
+      assert.match(hash, /^\$2[aby]\$04\$/);
+    });
   });
 
   [NaN, 0, 3, 32, 12.5, "4"].forEach(function (cost) {
@@ -189,6 +199,20 @@ describe("bcrypt password length limit", function () {
         assert.match(error.message, /72 bytes/);
       },
     );
+  });
+
+  it("hash() counts bytes, not characters", function () {
+    // "€" is 3 bytes in UTF-8.
+    return hashy.hash("€".repeat(24), "bcrypt").then(function () {
+      return hashy.hash("€".repeat(25), "bcrypt").then(
+        function () {
+          throw new Error("expected the promise to be rejected");
+        },
+        function (error) {
+          assert.match(error.message, /72 bytes/);
+        },
+      );
+    });
   });
 
   it("verify() accepts existing hashes of passwords over 72 bytes", function () {
@@ -250,6 +274,13 @@ describe("needsRehash()", function () {
     assert.strictEqual(needsRehash(hash, "bcrypt"), true);
   });
 
+  it("accepts per-call options", function () {
+    assert.strictEqual(
+      needsRehash(data["bcrypt 2"].hash, "bcrypt", { cost: 6 }),
+      true,
+    );
+  });
+
   it("throws for an invalid bcrypt cost", function () {
     assert.throws(function () {
       needsRehash(data["bcrypt 2"].hash, "bcrypt", { cost: NaN });
@@ -293,6 +324,12 @@ describe("verify()", function () {
       it("returns whether the password matches the hash", function () {
         return verify(datum.value, datum.hash).then(function (success) {
           assert.strictEqual(success, true);
+        });
+      });
+
+      it("returns false for a wrong password", function () {
+        return verify("wrong", datum.hash).then(function (success) {
+          assert.strictEqual(success, false);
         });
       });
     });
