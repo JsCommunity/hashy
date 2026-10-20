@@ -3,6 +3,7 @@
 const { describe, it } = require("node:test");
 const assert = require("assert");
 
+const argon2 = require("argon2");
 const bcrypt = require("bcryptjs");
 
 const hashy = require("./");
@@ -233,6 +234,21 @@ describe("needsRehash()", function () {
     // regardless of cost.
     const hash = data["bcrypt 2"].hash.replace("$2y$", "$2$");
     assert.strictEqual(needsRehash(hash, "bcrypt"), true);
+  });
+
+  it("returns true for a different argon2 variant", function () {
+    return argon2
+      .hash("test", { type: argon2.argon2i })
+      .then(function (hash) {
+        assert.strictEqual(needsRehash(hash, "argon2"), true);
+      })
+      .then(() => hashy.hash("test"))
+      .then(function (hash) {
+        assert.strictEqual(
+          needsRehash(hash, "argon2", { type: argon2.argon2i }),
+          true,
+        );
+      });
   });
 
   it("respects custom global options for argon2", function () {

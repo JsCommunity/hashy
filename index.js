@@ -62,9 +62,12 @@ function registerAlgorithm(algo) {
 
 const argon2 = require("argon2");
 
+// Indexed by argon2's type constants (argon2d = 0, argon2i = 1, argon2id = 2).
+const ARGON2_IDS = ["argon2d", "argon2i", "argon2id"];
+
 registerAlgorithm({
   name: "argon2",
-  ids: ["argon2d", "argon2i", "argon2id"],
+  ids: ARGON2_IDS,
 
   getOptions: (hash, info) => {
     let rawOptions = info.options;
@@ -103,7 +106,11 @@ registerAlgorithm({
   // configured global/per-call options) instead of hardcoding a copy
   // of argon2's defaults: whatever is left unset is compared against
   // argon2's own current defaults directly.
-  needsRehash: (hash, info, expected) => argon2.needsRehash(hash, expected),
+  //
+  // argon2.needsRehash ignores the variant, hence the explicit check.
+  needsRehash: (hash, info, expected) =>
+    info.id !== ARGON2_IDS[expected.type ?? argon2.argon2id] ||
+    argon2.needsRehash(hash, expected),
   verify: (password, hash) => argon2.verify(hash, password),
 });
 
