@@ -43,18 +43,11 @@
     "prettier": "^3.4.2"
   },
   "scripts": {
-    "test": "node --test && true",
+    "test": "node --test",
     "prepare": "husky"
   },
   "files": [
     "index.js",
     "cli.js"
-  ],
-  "lint-staged": {
-    "*": [
-      "npm test",
-      "prettier --ignore-unknown --write"
-    ],
-    "*.{{,c,m}j,t}s{,x}": "eslint --ignore-pattern '!*'"
-  }
+  ]
 }
