@@ -112,6 +112,9 @@ const bcrypt = require("bcryptjs");
 // Bcrypt silently truncates passwords over 72 bytes: two different
 // passwords sharing the same 72-byte prefix would hash (and verify)
 // identically. Reject upfront rather than let that go unnoticed.
+//
+// Only enforced when hashing: existing hashes of such passwords must
+// still verify so their owners can log in and be migrated.
 function checkBcryptPasswordLength(password) {
   if (bcrypt.truncates(password)) {
     throw new Error(
@@ -138,8 +141,6 @@ registerAlgorithm({
     // Otherwise, let the default algorithm decides.
   },
   verify: (password, hash) => {
-    checkBcryptPasswordLength(password);
-
     // See: https://github.com/ncb000gt/node.bcrypt.js/issues/175#issuecomment-26837823
     if (hash.startsWith("$2y$")) {
       hash = "$2a$" + hash.slice(4);

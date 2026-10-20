@@ -3,6 +3,8 @@
 const { describe, it } = require("node:test");
 const assert = require("assert");
 
+const bcrypt = require("bcryptjs");
+
 const hashy = require("./");
 
 // ===================================================================
@@ -174,15 +176,13 @@ describe("bcrypt password length limit", function () {
     );
   });
 
-  it("verify() rejects passwords over 72 bytes", function () {
-    return hashy.verify(longPassword, data["bcrypt 2"].hash).then(
-      function () {
-        throw new Error("expected the promise to be rejected");
-      },
-      function (error) {
-        assert.match(error.message, /72 bytes/);
-      },
-    );
+  it("verify() accepts existing hashes of passwords over 72 bytes", function () {
+    // Such hashes were produced before hash() started rejecting them,
+    // their owners must still be able to log in (and be migrated).
+    const legacyHash = bcrypt.hashSync(longPassword, 4);
+    return hashy.verify(longPassword, legacyHash).then(function (success) {
+      assert.strictEqual(success, true);
+    });
   });
 });
 
