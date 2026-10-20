@@ -111,12 +111,15 @@ describe("cli", function () {
     });
   });
 
-  it("does not accumulate aliases across repeated calls", function () {
-    return captureLog(() => cli(["secret"]))
-      .then(() => captureLog(() => cli(["secret"])))
-      .then(() => captureLog(() => cli(["--help"])))
-      .then(function (output) {
-        assert.strictEqual(output.match(/--help/g).length, 1);
-      });
+  it("rejects unknown options", function () {
+    return cli(["--foo", "secret"]).then(
+      function () {
+        throw new Error("expected the call to be rejected");
+      },
+      function (error) {
+        assert.match(error, /Usage: hashy/);
+        assert.match(error, /--foo/);
+      },
+    );
   });
 });

@@ -2,10 +2,7 @@
 
 "use strict";
 
-// Builds a fresh parser per call instead of reusing the singleton from
-// require("yargs"), which would otherwise accumulate aliases/examples
-// across repeated main() calls in the same process.
-const yargsFactory = require("yargs/yargs");
+const { parseArgs } = require("node:util");
 
 // --------------------------------------------------------------------
 
@@ -13,40 +10,44 @@ const hashy = require("./");
 
 // ====================================================================
 
+const HELP = `Usage: hashy [<option>...]
+
+Options:
+  -a, --algorithm  algorithm to use for hashing  [default: "${hashy.DEFAULT_ALGO}"]
+  -c, --cost       cost for Bcrypt
+  -h, --help       show help
+  -v, --version    show version number
+
+Examples:
+  hashy [ -a <algorithm> ] <secret>  hash the secret
+  hashy <secret> <hash>              verify the secret using the hash`;
+
 async function main(argv) {
-  const yargs = yargsFactory();
-  // TESTABILITY: makes yargs throw instead of exiting, including from its
-  // built-in --help/--version handling (which prints and would otherwise
-  // call process.exit() before main() below ever gets to run).
-  yargs.exitProcess(false);
-  yargs.fail((msg) => {
-    const help = yargs.help();
-    throw msg ? `${help}\n${msg}` : help;
-  });
-
-  const options = yargs
-    .usage("Usage: hashy [<option>...]")
-    .example("hashy [ -a <algorithm> ] <secret>", "hash the secret")
-    .example("hashy <secret> <hash>", "verify the secret using the hash")
-    // Aliases rather than options: yargs already owns "help" and
-    // "version" as built-in commands and warns if they are redefined.
-    .alias("h", "help")
-    .alias("v", "version")
-    .options({
-      a: {
-        default: hashy.DEFAULT_ALGO,
-        describe: "algorithm to use for hashing",
+  let parsed;
+  try {
+    parsed = parseArgs({
+      args: argv,
+      allowPositionals: true,
+      options: {
+        algorithm: { type: "string", short: "a" },
+        cost: { type: "string", short: "c" },
+        help: { type: "boolean", short: "h" },
+        version: { type: "boolean", short: "v" },
       },
-      c: {
-        alias: "cost",
-        describe: "cost for Bcrypt",
-      },
-    })
-    .parse(argv);
+    });
+  } catch (error) {
+    throw `${HELP}\n${error.message}`;
+  }
+  const { values: options, positionals: args } = parsed;
+  const algorithm = options.algorithm ?? hashy.DEFAULT_ALGO;
 
-  // yargs' built-in --help/--version handling already printed the
-  // relevant text as a side effect of .parse() above.
-  if (options.help || options.version) {
+  if (options.help) {
+    console.log(HELP);
+    return;
+  }
+
+  if (options.version) {
+    console.log(require("./package.json").version);
     return;
   }
 
@@ -54,10 +55,8 @@ async function main(argv) {
     hashy.options.bcrypt.cost = +options.cost;
   }
 
-  const args = options._;
-
   if (args.length === 1) {
-    console.log(await hashy.hash(args[0], options.a));
+    console.log(await hashy.hash(args[0], algorithm));
     return;
   }
 
@@ -68,7 +67,7 @@ async function main(argv) {
       throw new Error("not ok");
     }
 
-    return hashy.needsRehash(hash, options.a)
+    return hashy.needsRehash(hash, algorithm)
       ? "ok but password should be rehashed"
       : "ok";
   }
